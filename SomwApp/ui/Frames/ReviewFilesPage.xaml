@@ -1,0 +1,146 @@
+﻿<Page x:Class="SomwApp.ui.Frames.ReviewFilesPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:SomwApp.ui.Frames"
+      xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+      xmlns:rules="clr-namespace:SomwApp.presentation.rules"
+      xmlns:converters="clr-namespace:SomwApp.presentation.converters"
+      mc:Ignorable="d" 
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="ReviewFilesPage" Background="White" DataContext="{Binding RelativeSource={RelativeSource Self}, Path=viewModel}">
+    <Page.Resources>
+        <converters:DateOnlyConverter x:Key="DateTimeToDateConverter"/>
+        <converters:ReviewTypeConverter x:Key="ReviewTypeConverter"/>
+        <converters:ReviewTypesConverter x:Key="ReviewTypesConverter"/>
+    </Page.Resources>
+    <Grid Margin="4,8">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2.5*"/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <Menu Grid.ColumnSpan="2" HorizontalAlignment="Stretch">
+            <MenuItem Header="Управление отчётами">
+                <MenuItem Header="Удалить отчёты" Icon="{materialDesign:PackIcon Kind=Delete}" Command="{Binding ReviewsDeleteCommand}" CommandParameter="{Binding ReviewsToOperate}"/>
+                <MenuItem Header="Скачать отчёты" Icon="{materialDesign:PackIcon Kind=Download}" Command="{Binding ReviewsDownloadCommand}" CommandParameter="{Binding ReviewsToOperate}"/>
+                <MenuItem Header="Отменить скачивание" Icon="{materialDesign:PackIcon Kind=Stop}" Command="{Binding ReviewsCancelDownloadCommand}" CommandParameter="{Binding ElementName=DownloadQueueDGr, Path=SelectedItem}"/>
+            </MenuItem>
+        </Menu>
+        <TabControl Grid.Row="1">
+            <TabItem Header="Отчёты">
+                <DataGrid Name="ReviewsDgr" ItemsSource="{Binding ReviewFiles}" SelectionMode="Extended"  Grid.Row="1" CanUserAddRows="False"  AutoGenerateColumns="False" IsReadOnly="True" SelectionChanged="OnReviewsSelectionChanged">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Название отчёта" Binding="{Binding ReviewName}"/>
+                        <DataGridTextColumn Header="Тип отчёта" Binding="{Binding ReviewType, Converter={StaticResource ReviewTypeConverter}}"/>
+                        <DataGridTextColumn Header="Дата создания" Binding="{Binding ReviewDate, ConverterCulture=ru}"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </TabItem>
+            <TabItem Header="Очередь загрузки">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition Height="3*"/>
+                    </Grid.RowDefinitions>
+                <StackPanel>
+                    <TextBlock Grid.ColumnSpan="2" Padding="8" Text="Прогресс загрузки файла" HorizontalAlignment="Stretch" FontSize="20" FontFamily="Sans" FontWeight="Bold"/>
+                    <ProgressBar Name="DownloadProgress" Height="16" Margin="8,12"/>
+                </StackPanel>
+                    <DataGrid Name="DownloadQueueDGr" ItemsSource="{Binding DownloadQueue}" HeadersVisibility="None" SelectionMode="Single" Grid.Row="1" CanUserAddRows="False"  AutoGenerateColumns="False" IsReadOnly="True" >
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Название отчёта" Binding="{Binding ReviewName}"/>
+                            <DataGridTextColumn Header="Тип отчёта" Binding="{Binding ReviewType, Converter={StaticResource ReviewTypeConverter}}"/>
+                            <DataGridTextColumn Header="Дата создания" Binding="{Binding ReviewDate, ConverterCulture=ru}"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </TabItem>
+        </TabControl>
+        <TabControl Grid.Row="1" Grid.Column="1">
+            <TabItem Header="Данные">
+                <ScrollViewer VerticalScrollBarVisibility="Hidden" VerticalAlignment="Stretch" >
+                    <Grid Name="InfoField" DataContext="{Binding ReviewFileRequest}" >
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition Height="2*"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.ColumnSpan="2" Padding="8" Text="Фомирование отчёта" HorizontalAlignment="Center" FontSize="20" FontFamily="Sans" FontWeight="Bold"/>
+
+                        <TextBlock Grid.Row="1" Text="Название отчёта" FontSize="14" FontFamily="Sans" Padding="8" TextAlignment="Center" VerticalAlignment="Center"/>
+                        <TextBox Grid.Row="1" Grid.Column="1" FontSize="10" FontFamily="Sans" Margin="8" VerticalAlignment="Center" TextWrapping="NoWrap" TextAlignment="Center">
+                            <TextBox.Text>
+                                <Binding Path="ReviewName" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                                    <Binding.ValidationRules>
+                                        <rules:OnlyLettersRule/>
+                                        <ExceptionValidationRule/>
+                                    </Binding.ValidationRules>
+                                </Binding>
+                            </TextBox.Text>
+                        </TextBox>
+
+                        <TextBlock Grid.Row="2" Text="Дата начала учёта данных" TextWrapping="Wrap" FontSize="14" FontFamily="Sans" Padding="8" TextAlignment="Center" VerticalAlignment="Center"/>
+                        <DatePicker Grid.Column="1" Grid.Row="2" Margin="8,0" SelectedDate="{Binding DateFrom, ConverterCulture=ru}" VerticalAlignment="Center"/>
+
+
+                        <TextBlock Grid.Row="3" Text="Дата окончания учёта данных:" TextWrapping="Wrap" FontSize="14" FontFamily="Sans" Padding="8" TextAlignment="Center" VerticalAlignment="Center"/>
+                        <DatePicker Grid.Column="1" Grid.Row="3" Margin="8,0" SelectedDate="{Binding DateTo, ConverterCulture=ru}" VerticalAlignment="Center"/>
+
+                        <TextBlock Grid.Row="4" Text="Тип отчёта" TextWrapping="Wrap" FontSize="14" FontFamily="Sans" Padding="8" TextAlignment="Center" VerticalAlignment="Center"/>
+                        <ComboBox Grid.Column="1" Grid.Row="4" Margin="12" FontSize="10" FontFamily="Sans" ItemsSource="{Binding RelativeSource={RelativeSource AncestorType={x:Type Page}}, Path=DataContext.ReviewTypes, Converter={StaticResource ReviewTypesConverter}}" SelectedItem="{Binding ReviewType, Converter={StaticResource ReviewTypeConverter}}" />
+                        
+                        <StackPanel Grid.Row="5" Grid.ColumnSpan="2">
+                            <Button Content="Добавить данные об отчёте" Grid.Row="5" Grid.ColumnSpan="2" VerticalAlignment="Center" Margin="8" Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type Page}}, Path=DataContext.ReviewAddCommand}" CommandParameter="{Binding ElementName=InfoField, Path=DataContext}"/>
+                        </StackPanel>
+                    </Grid>
+                </ScrollViewer>
+            </TabItem>
+            <TabItem Header="Фильтрация">
+                <StackPanel Orientation="Vertical">
+                    <TextBlock Grid.ColumnSpan="2" Padding="8" Text="Атрибуты фильтрации" HorizontalAlignment="Center" FontSize="18" FontFamily="Sans" FontWeight="Bold"/>
+                    <Separator Margin="0,12"/>
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Padding="8,4" Text="По типу отчёта" TextAlignment="Left" HorizontalAlignment="Stretch" VerticalAlignment="Center" FontSize="14" FontFamily="Sans" />
+                        <ComboBox Grid.Column="1" Margin="9,0" HorizontalAlignment="Stretch" VerticalAlignment="Center" ItemsSource="{Binding ReviewTypes, Converter={StaticResource ReviewTypesConverter}}" SelectedItem="{Binding ReviewTypeFilter, Converter={StaticResource ReviewTypeConverter}}"/>
+                    </Grid>
+                    <Separator Margin="0,12"/>
+
+                    <TextBlock Padding="0,4" Text="По дате" TextAlignment="Center" VerticalAlignment="Center" FontSize="14" FontFamily="Sans" />
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <TextBlock  Padding="0,4" Text="Дата с" TextAlignment="Center" VerticalAlignment="Center" FontSize="14" FontFamily="Sans" />
+                        <DatePicker Grid.Column="1" Margin="8,4" VerticalAlignment="Center" SelectedDate="{Binding DateFromFilter, ConverterCulture=ru}"/>
+                        <TextBlock Grid.Row="1" Padding="0,4" Text="Дата по" TextAlignment="Center" VerticalAlignment="Center" FontSize="14" FontFamily="Sans" />
+                        <DatePicker Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" Margin="8,4" SelectedDate="{Binding DateToFilter, ConverterCulture=ru}"/>
+                    </Grid>
+                    <Separator Margin="0,12"/>
+                    <Button Content="Сбросить фильтры" VerticalAlignment="Center" Margin="8" Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type Page}}, Path=DataContext.ClearFiltersCommand}"/>
+                </StackPanel>
+            </TabItem>
+        </TabControl>
+    </Grid>
+</Page>

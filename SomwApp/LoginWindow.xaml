@@ -1,0 +1,45 @@
+﻿<Window x:Class="SomwApp.LoginWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SomwApp"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:rules="clr-namespace:SomwApp.presentation.rules"
+        xmlns:converters="clr-namespace:SomwApp.presentation.converters"
+        xmlns:presentation="clr-namespace:SomwApp.presentation"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterScreen"
+        mc:Ignorable="d"
+        WindowStyle="None"
+        Title="LoginWindow" Height="350" Width="450" DataContext="{Binding RelativeSource={RelativeSource Self}, Path=viewModel}">
+    <Grid Name="InfoField" DataContext="{Binding AuthRequest}">
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <TextBlock Grid.ColumnSpan="2" Margin="0,12"  Text="Авторизация" HorizontalAlignment="Stretch" TextAlignment="Center" VerticalAlignment="Top" FontSize="20" FontFamily="Sans" FontWeight="Bold"/>
+
+        <TextBlock Grid.Row="1" Text="Логин" HorizontalAlignment="Stretch" TextAlignment="Center" VerticalAlignment="Center" FontSize="20" FontFamily="Sans" FontWeight="Bold"/>
+        <TextBox Grid.Row="1" Grid.Column="1" FontSize="10" FontFamily="Sans" Margin="12" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" TextWrapping="Wrap" TextAlignment="Center">
+            <TextBox.Text>
+                <Binding Path="Login" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                    <Binding.ValidationRules>
+                        <ExceptionValidationRule/>
+                    </Binding.ValidationRules>
+                </Binding>
+            </TextBox.Text>
+        </TextBox>
+        <TextBlock Grid.Row="2" Text="Пароль" HorizontalAlignment="Stretch" TextAlignment="Center" VerticalAlignment="Center" FontSize="20" FontFamily="Sans" FontWeight="Bold"/>
+        <PasswordBox PasswordChar="#" Name="Password_Input" Grid.Row="2" Grid.Column="1" Margin="12" ToolTip="Enter your login" FontFamily="Sans" FontSize="10" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
+             presentation:PasswordHelper.Attach="True" presentation:PasswordHelper.Password="{Binding Password, Mode=OneWayToSource}"/>
+
+        <Button Content="Подтвердить" Grid.Row="3" Grid.ColumnSpan="2" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Margin ="12,8" Click="Button_Click" />
+    </Grid>
+</Window>

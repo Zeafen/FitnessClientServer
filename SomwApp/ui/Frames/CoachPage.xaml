@@ -1,0 +1,169 @@
+﻿<Page x:Class="SomwApp.ui.Frames.CoachPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:SomwApp.ui.Frames"
+      xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+      xmlns:rules="clr-namespace:SomwApp.presentation.rules"
+      xmlns:converters="clr-namespace:SomwApp.presentation.converters"
+      mc:Ignorable="d" 
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="CoachPage" Background="White" DataContext="{Binding RelativeSource={RelativeSource Self}, Path=viewModel}">
+    <Page.Resources>
+        <converters:DateOnlyConverter x:Key="DateTimeToDateConverter"/>
+        <converters:SubscriptionStatusConverter x:Key="SubscriptionStatusToStringConverter"/>
+    </Page.Resources>
+    <Grid Margin="4,8">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2.5*"/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Padding="8" Text="Специализация" HorizontalAlignment="Center" VerticalAlignment="Top"  Margin="0,4" FontSize="14" FontFamily="Sans"/>
+            <Button Grid.Column="2" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="9,4" Background="Transparent" Click="OnClearFilterClick">
+                <Button.Content>
+                    <materialDesign:PackIcon Kind="CancelBold" />
+                </Button.Content>
+            </Button>
+            <TextBox Grid.Row="1" Grid.Column="1" FontSize="10" FontFamily="Sans" Margin="8" VerticalAlignment="Center" TextWrapping="NoWrap" TextAlignment="Center">
+                <TextBox.Text>
+                    <Binding Path="SpecializationFilter" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                        <Binding.ValidationRules>
+                            <rules:OnlyLettersRule/>
+                            <rules:LettersLimitRule Min="1"  Max="100"/>
+                            <ExceptionValidationRule/>
+                        </Binding.ValidationRules>
+                    </Binding>
+                </TextBox.Text>
+            </TextBox>
+        </Grid>
+        <DataGrid Name="CoachesDgr" ItemsSource="{Binding Coaches}" SelectionChanged="CoachesDgr_SelectionChanged" Grid.Row="1" CanUserAddRows="False"  AutoGenerateColumns="False" IsReadOnly="True">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="ID" Binding="{Binding ID_Coaches}"/>
+                <DataGridTextColumn Header="Имя" Binding="{Binding Name}"/>
+                <DataGridTextColumn Header="Фамилия" Binding="{Binding Surname}"/>
+                <DataGridTextColumn Header="Отчество" Binding="{Binding MiddleName}"/>
+                <DataGridTextColumn Header="Специализация" Binding="{Binding Specialization}"/>
+                <DataGridTextColumn Header="Телефонный номер" Binding="{Binding PhoneNumber}"/>
+                <DataGridTextColumn Header="Оплата за занятие" Binding="{Binding LessonsSchedule}"/>
+                <DataGridTextColumn Header="Учётная запись" Binding="{Binding UserAccounts.Login}"/>
+            </DataGrid.Columns>
+        </DataGrid>
+        <ScrollViewer Grid.RowSpan="2" Grid.Column="1" VerticalScrollBarVisibility="Hidden">
+            <Grid Name="InfoField" DataContext="{Binding SelectedCoach}" >
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition Height="2*"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.ColumnSpan="2" Padding="8" Text="Данные о тренере" HorizontalAlignment="Center" FontSize="20" FontFamily="Sans" FontWeight="Bold"/>
+
+                <TextBlock Grid.Row="1" Text="Имя" TextWrapping="Wrap" FontSize="14" FontFamily="Sans" Padding="8" TextAlignment="Center" VerticalAlignment="Center"/>
+                <TextBox Grid.Row="1" Grid.Column="1" FontSize="10" FontFamily="Sans" Margin="8" VerticalAlignment="Center" TextWrapping="NoWrap" TextAlignment="Center">
+                    <TextBox.Text>
+                        <Binding Path="Name" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                            <Binding.ValidationRules>
+                                <rules:OnlyLettersRule/>
+                                <rules:LettersLimitRule Min="1"  Max="255"/>
+                                <ExceptionValidationRule/>
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </TextBox.Text>
+                </TextBox>
+
+                <TextBlock Grid.Row="2" Text="Фамилия" TextWrapping="Wrap" FontSize="14" FontFamily="Sans" Padding="8" TextAlignment="Center" VerticalAlignment="Center"/>
+                <TextBox Grid.Row="2" Grid.Column="1" FontSize="10" FontFamily="Sans" Margin="8" VerticalAlignment="Center" TextWrapping="NoWrap" TextAlignment="Center">
+                    <TextBox.Text>
+                        <Binding Path="Surname" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                            <Binding.ValidationRules>
+                                <rules:OnlyLettersRule/>
+                                <rules:LettersLimitRule Min="1"  Max="255"/>
+                                <ExceptionValidationRule/>
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </TextBox.Text>
+                </TextBox>
+
+                <TextBlock Grid.Row="3" Text="Отчество" TextWrapping="Wrap" FontSize="14" FontFamily="Sans" Padding="8" TextAlignment="Center" VerticalAlignment="Center"/>
+                <TextBox Grid.Row="3" Grid.Column="1" FontSize="10" FontFamily="Sans" Margin="8" VerticalAlignment="Center" TextWrapping="NoWrap" TextAlignment="Center">
+                    <TextBox.Text>
+                        <Binding Path="MiddleName" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                            <Binding.ValidationRules>
+                                <rules:OnlyLettersRule/>
+                                <rules:LettersLimitRule Min="1"  Max="255"/>
+                                <ExceptionValidationRule/>
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </TextBox.Text>
+                </TextBox>
+
+                <TextBlock Grid.Row="4" Text="Специализация" FontSize="14" FontFamily="Sans" Padding="8" TextAlignment="Center" VerticalAlignment="Center"/>
+                <TextBox Grid.Row="4" Grid.Column="1" FontSize="10" FontFamily="Sans" Margin="8" VerticalAlignment="Center" TextWrapping="NoWrap" TextAlignment="Center">
+                    <TextBox.Text>
+                        <Binding Path="Specialization" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                            <Binding.ValidationRules>
+                                <rules:OnlyLettersRule/>
+                                <rules:LettersLimitRule Min="1"  Max="100"/>
+                                <ExceptionValidationRule/>
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </TextBox.Text>
+                </TextBox>
+                <TextBlock Grid.Row="5" Text="Опалата за занятие" TextWrapping="Wrap" FontSize="14" FontFamily="Sans" Padding="8" TextAlignment="Center" VerticalAlignment="Center"/>
+                <TextBox Grid.Row="5" Grid.Column="1" FontSize="10" FontFamily="Sans" Margin="8" VerticalAlignment="Center" TextWrapping="NoWrap" TextAlignment="Center">
+                    <TextBox.Text>
+                        <Binding Path="LessonsSchedule" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                            <Binding.ValidationRules>
+                                <rules:DoubleNumValidationRule/>
+                                <ExceptionValidationRule/>
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </TextBox.Text>
+                </TextBox>
+                
+                
+                <TextBlock Grid.Row="6" Text="Телефонный номер" TextWrapping="Wrap" FontSize="14" FontFamily="Sans" Padding="8" TextAlignment="Center" VerticalAlignment="Center"/>
+                <TextBox Grid.Row="6" Grid.Column="1" FontSize="10"  FontFamily="Sans" Margin="8" VerticalAlignment="Center" TextWrapping="NoWrap" TextAlignment="Center">
+                    <TextBox.Text>
+                        <Binding Path="PhoneNumber" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                            <Binding.ValidationRules>
+                                <rules:IntNumValidationRule/>
+                                <rules:LettersLimitRule Min="1"  Max="15"/>
+                                <ExceptionValidationRule/>
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </TextBox.Text>
+                </TextBox>
+                
+                <TextBlock Grid.Row="7" Text="Учётная запись" TextWrapping="Wrap" FontSize="14" FontFamily="Sans" Padding="8" TextAlignment="Center" VerticalAlignment="Center"/>
+                <ComboBox Grid.Column="2" Grid.Row="7" Margin="12" FontSize="10" FontFamily="Sans" ItemsSource="{Binding RelativeSource={RelativeSource AncestorType={x:Type Page}}, Path=DataContext.Accounts}" SelectedItem="{Binding UserAccounts}" DisplayMemberPath="Login"/>
+
+                <StackPanel Grid.Row="8" Grid.ColumnSpan="2">
+                    <Button Content="Изменить данные об тренере" Grid.Row="3" Grid.ColumnSpan="2" VerticalAlignment="Center" Margin="8" Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type Page}}, Path=DataContext.CoachEditCommand}" CommandParameter="{Binding ElementName=InfoField, Path=DataContext}"/>
+                    <Button Content="Удалить данные об тренере" Grid.Row="4" Grid.ColumnSpan="2" VerticalAlignment="Center" Margin="8" Click="Button_Click"/>
+                    <Button Content="Добавить данные об тренере" Grid.Row="5" Grid.ColumnSpan="2" VerticalAlignment="Center" Margin="8" Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type Page}}, Path=DataContext.CoachAddCommand}" CommandParameter="{Binding ElementName=InfoField, Path=DataContext}"/>
+                </StackPanel>
+            </Grid>
+        </ScrollViewer>
+    </Grid>
+</Page>
