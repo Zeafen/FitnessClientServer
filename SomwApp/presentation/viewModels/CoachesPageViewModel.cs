@@ -82,21 +82,21 @@ namespace SomwApp.presentation.viewModels
             {
                 Coaches.Clear();
                 Accounts.Clear();
+                foreach (var account in _accsDataSource.GetAccounts()?? new List<UserAccounts>())
+                    Accounts.Add(account);
 
                 foreach (var coach in _coachesDataSource.GetCoaches()??new List<Coach>())
                     Coaches.Add(new CoachModel()
                     {
                         ID_Coaches = coach.ID_Coaches,
                         Name = coach.Name,
-                        UserAccounts = coach.ID_UserAccounts.HasValue ? _accsDataSource.GetAccountByID(coach.ID_UserAccounts.Value) : null,
+                        UserAccounts = coach.ID_UserAccounts.HasValue ? Accounts.FirstOrDefault(ac => ac.ID_UserAccounts == coach.ID_UserAccounts) : null,
                         LessonsSchedule = coach.LessonsSchedule,
                         MiddleName = coach.MiddleName,
                         PhoneNumber = coach.PhoneNumber,
                         Specialization = coach.Specialization,
                         Surname = coach.Surname,
                     });
-                foreach (var account in _accsDataSource.GetAccounts()?? new List<UserAccounts>())
-                    Accounts.Add(account);
             }, _cts.Token);
         }
 
@@ -107,15 +107,15 @@ namespace SomwApp.presentation.viewModels
         {
             Task.Run(() =>
             {
+                    Coaches.Clear();
                 if (!string.IsNullOrEmpty(SpecializationFilter))
                 {
-                    Coaches.Clear();
-                    foreach (var coach in _coachesDataSource.GetCoachesBySpecialization(SpecializationFilter))
+                    foreach (var coach in _coachesDataSource.GetCoachesBySpecialization(SpecializationFilter) ?? new List<Coach>())
                         Coaches.Add(new CoachModel()
                         {
                             ID_Coaches = coach.ID_Coaches,
                             Name = coach.Name,
-                            UserAccounts = coach.ID_UserAccounts.HasValue ? _accsDataSource.GetAccountByID(coach.ID_UserAccounts.Value) : null,
+                            UserAccounts = coach.ID_UserAccounts.HasValue ? Accounts.FirstOrDefault(ac => ac.ID_UserAccounts == coach.ID_UserAccounts) : null,
                             LessonsSchedule = coach.LessonsSchedule,
                             MiddleName = coach.MiddleName,
                             PhoneNumber = coach.PhoneNumber,
@@ -124,7 +124,18 @@ namespace SomwApp.presentation.viewModels
                         });
 
                 }
-                else UpdateData();
+                else foreach (var coach in _coachesDataSource.GetCoaches() ?? new List<Coach>())
+                        Coaches.Add(new CoachModel()
+                        {
+                            ID_Coaches = coach.ID_Coaches,
+                            Name = coach.Name,
+                            UserAccounts = coach.ID_UserAccounts.HasValue ? Accounts.FirstOrDefault(ac => ac.ID_UserAccounts == coach.ID_UserAccounts) : null,
+                            LessonsSchedule = coach.LessonsSchedule,
+                            MiddleName = coach.MiddleName,
+                            PhoneNumber = coach.PhoneNumber,
+                            Specialization = coach.Specialization,
+                            Surname = coach.Surname,
+                        }); ;
             }, _cts.Token);
         }
 
@@ -135,6 +146,8 @@ namespace SomwApp.presentation.viewModels
         private void DeleteCoach(CoachModel model)
         {
             _coachesDataSource.DeleteCoach(model.ID_Coaches);
+            _cts.Cancel();
+            _cts = new CancellationTokenSource();
             ApplyFilters();
         }
 
@@ -145,6 +158,8 @@ namespace SomwApp.presentation.viewModels
         private void EditCoach(CoachModel model)
         {
             _coachesDataSource.EditCoach((Coach)model);
+            _cts.Cancel();
+            _cts = new CancellationTokenSource();
             ApplyFilters();
         }
 
@@ -155,14 +170,19 @@ namespace SomwApp.presentation.viewModels
         private void AddCoach(CoachModel model)
         {
             _coachesDataSource.AddCoach((Coach)model);
+            _cts.Cancel();
+            _cts = new CancellationTokenSource();
             ApplyFilters();
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;
         private void onPropertyChanged([CallerMemberName] string propertyName = "")
         {
-            if (propertyName == nameof(SpecializationFilter))
+            if (propertyName == nameof(SpecializationFilter)){
+                _cts.Cancel();
+                _cts = new CancellationTokenSource();
                 ApplyFilters();
+            }
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }

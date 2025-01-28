@@ -49,6 +49,7 @@ namespace SomwApp.domain.models
                 NumberOfPracticants = model.NumberOfPracticants,
                 DurationClasses = model.Hours,
                 ID_Coaches = model.Coach.ID_Coaches,
+                ID_Branches = model.Branch.ID_Branches,
             };
         }
     }

@@ -161,15 +161,15 @@ namespace SomwApp.data.FitnessApiDataSources
                 if (token == null)
                     return null;
                 client.DefaultRequestHeaders.Add("Authorization", token);
-                var result = client.GetAsync(startURL + $"{branchID}").Result;
+                var result = client.GetAsync(startURL + $"/{branchID}").Result;
                 if (!result.IsSuccessStatusCode)
-                    MessageBox.Show($"Не удалось добавить запись. \n{result.StatusCode}: {result.Content}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show($"Не удалось получить запись. \n{result.StatusCode}: {result.Content}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return JsonConvert.DeserializeObject<Branches>(result.Content.ReadAsStringAsync().Result);
 
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Не удалось добавить запись. {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Не удалось получить запись. {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return null;
             }
         }

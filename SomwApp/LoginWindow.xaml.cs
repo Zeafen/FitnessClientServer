@@ -64,8 +64,8 @@ namespace SomwApp
                                 ScreensEnum.Coaches,
                                 ScreensEnum.Accounts,
                                 ScreensEnum.Customers,
-                                ScreensEnum.Subscriptions,
                                 ScreensEnum.Payments,
+                                ScreensEnum.ReviewFiles,
                             };
                             break;
                         case "Leader":

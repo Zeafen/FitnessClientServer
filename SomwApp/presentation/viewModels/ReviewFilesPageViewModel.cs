@@ -38,7 +38,7 @@ namespace SomwApp.presentation.viewModels
         private IFilesService _filesService = FilesFitDataSource.GetInstance();
 
         public HttpClient _DownloadClient { get; private set; }
-        public CancellationTokenSource cancelToken {  get; private set; }
+        public CancellationTokenSource cancelToken { get; private set; } = new CancellationTokenSource();
         private TaskFactory downloadFileTask;
 
         public ObservableCollection<ReviewFile> ReviewFiles { get; set; } = new ObservableCollection<ReviewFile>();
@@ -120,7 +120,8 @@ namespace SomwApp.presentation.viewModels
 
             object lockDownloads = new object();
             BindingOperations.EnableCollectionSynchronization(DownloadQueue, lockDownloads);
-            cancelToken = new CancellationTokenSource();
+            BindingOperations.EnableCollectionSynchronization(ReviewFiles, lockDownloads);
+            BindingOperations.EnableCollectionSynchronization(ReviewsToOperate, lockDownloads);
             var handler = new HttpClientHandler();
             handler.ClientCertificateOptions = ClientCertificateOption.Manual;
             handler.ServerCertificateCustomValidationCallback =
@@ -230,6 +231,7 @@ namespace SomwApp.presentation.viewModels
             if (DownloadQueue.IndexOf(file) == 0)
             {
                 cancelToken.Cancel();
+                cancelToken = new CancellationTokenSource();
                 if (File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory) + $@"\{file.ReviewName}.pdf"))
                     File.Delete(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory) + $@"\{file.ReviewName}.pdf");
                 DownloadQueue.Remove(file);

@@ -62,6 +62,8 @@ namespace SomwApp.presentation.viewModels
                     onPropertyChanged();
                     _subscribtionFilter = null;
                     onPropertyChanged(nameof(SubscriptionFilter));
+                    _cts.Cancel();
+                    _cts = new CancellationTokenSource();
                     ApplyFilters();
                 }
             }
@@ -78,6 +80,8 @@ namespace SomwApp.presentation.viewModels
                     onPropertyChanged();
                     _customerFilter = null;
                     onPropertyChanged(nameof(CustomerFilter));
+                    _cts.Cancel();
+                    _cts = new CancellationTokenSource();
                     ApplyFilters();
                 }
             }
@@ -125,6 +129,8 @@ namespace SomwApp.presentation.viewModels
                 ValidityEndDate = model.PaymentDate.AddDays(model.Subscription.ValidityDaysNumber),
             };
             paysDataSource.EditPayment(editedPayment);
+            _cts.Cancel();
+            _cts = new CancellationTokenSource();
             ApplyFilters();
         }
 
@@ -135,6 +141,7 @@ namespace SomwApp.presentation.viewModels
         private void AddPayment(PaymentModel model)
         {
             paysDataSource.AddPayment((Payment)model);
+            _cts.Cancel();
             ApplyFilters();
         }
 
@@ -145,6 +152,8 @@ namespace SomwApp.presentation.viewModels
         private void DeletePayment(PaymentModel model)
         {
             paysDataSource.DeletePayment(model.ID_Payment);
+            _cts.Cancel();
+            _cts = new CancellationTokenSource();
             ApplyFilters();
         }
 
@@ -199,6 +208,10 @@ namespace SomwApp.presentation.viewModels
                 Payments.Clear();
                 Customers.Clear();
                 Subscriptions.Clear();
+                foreach (var cust in custDataSource.GetCustomers() ?? new List<Customer>())
+                    Customers.Add(cust);
+                foreach (var subscription in subsDataSource.GetSubscriptions() ?? new List<Subscription>())
+                    Subscriptions.Add(subscription);
 
                 foreach (var model in (from payment in paysDataSource.GetPayments()
                                        select new PaymentModel()
@@ -207,14 +220,10 @@ namespace SomwApp.presentation.viewModels
                                            Amount = payment.Amount,
                                            ValidityEndDate = payment.ValidityEndDate,
                                            PaymentDate = payment.PaymentDate,
-                                           Customer = custDataSource.GetCustomer(payment.ID_Customers),
-                                           Subscription = subsDataSource.GetSubscription(payment.ID_Subscription)
+                                           Customer = Customers.FirstOrDefault(c => c.ID_Customers == payment.ID_Customers),
+                                           Subscription = Subscriptions.FirstOrDefault(s => s.ID_Subscription == payment.ID_Subscription)
                                        }))
                     Payments.Add(model);
-                foreach (var cust in custDataSource.GetCustomers() ?? new List<Customer>())
-                    Customers.Add(cust);
-                foreach (var subscription in subsDataSource.GetSubscriptions() ?? new List<Subscription>())
-                    Subscriptions.Add(subscription);
             }, _cts.Token);
         }
 
@@ -235,8 +244,8 @@ namespace SomwApp.presentation.viewModels
                                               Amount = payment.Amount,
                                               ValidityEndDate = payment.ValidityEndDate,
                                               PaymentDate = payment.PaymentDate,
-                                              Customer = custDataSource.GetCustomer(payment.ID_Customers),
-                                              Subscription = subsDataSource.GetSubscription(payment.ID_Subscription)
+                                              Customer = Customers.FirstOrDefault(c => c.ID_Customers == payment.ID_Customers),
+                                              Subscription = Subscriptions.FirstOrDefault(s => s.ID_Subscription == payment.ID_Subscription)
                                           })
                     {
                         Payments.Add(model);
@@ -249,8 +258,8 @@ namespace SomwApp.presentation.viewModels
                                               Amount = payment.Amount,
                                               ValidityEndDate = payment.ValidityEndDate,
                                               PaymentDate = payment.PaymentDate,
-                                              Customer = custDataSource.GetCustomer(payment.ID_Customers),
-                                              Subscription = subsDataSource.GetSubscription(payment.ID_Subscription)
+                                              Customer = Customers.FirstOrDefault(c => c.ID_Customers == payment.ID_Customers),
+                                              Subscription = Subscriptions.FirstOrDefault(s => s.ID_Subscription == payment.ID_Subscription)
                                           })
                     {
                         Payments.Add(model);
@@ -263,8 +272,8 @@ namespace SomwApp.presentation.viewModels
                                               Amount = payment.Amount,
                                               ValidityEndDate = payment.ValidityEndDate,
                                               PaymentDate = payment.PaymentDate,
-                                              Customer = custDataSource.GetCustomer(payment.ID_Customers),
-                                              Subscription = subsDataSource.GetSubscription(payment.ID_Subscription)
+                                              Customer = Customers.FirstOrDefault(c => c.ID_Customers == payment.ID_Customers),
+                                              Subscription = Subscriptions.FirstOrDefault(s => s.ID_Subscription == payment.ID_Subscription)
                                           })
                     {
                         Payments.Add(model);

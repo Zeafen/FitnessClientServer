@@ -11,6 +11,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Data;
+using static MaterialDesignThemes.Wpf.Theme.ToolBar;
 
 namespace SomwApp.presentation.viewModels
 {
@@ -60,6 +61,8 @@ namespace SomwApp.presentation.viewModels
                     onClearFilters();
                     _customerFilter = value;
                     onPropertyChanged();
+                    _cts.Cancel();
+                    _cts = new CancellationTokenSource();
                     ApplyFilters();
                 }
             }
@@ -76,6 +79,8 @@ namespace SomwApp.presentation.viewModels
                     onClearFilters();
                     _lessonFilter = value;
                     onPropertyChanged();
+                    _cts.Cancel();
+                    _cts = new CancellationTokenSource();
                     ApplyFilters();
                 }
             }
@@ -92,6 +97,8 @@ namespace SomwApp.presentation.viewModels
                     onClearFilters();
                     _dateFromFilter = value;
                     onPropertyChanged();
+                    _cts.Cancel();
+                    _cts = new CancellationTokenSource();
                     ApplyFilters();
                 }
             }
@@ -107,6 +114,8 @@ namespace SomwApp.presentation.viewModels
                     onClearFilters();
                     _dateToFilter = value;
                     onPropertyChanged();
+                    _cts.Cancel();
+                    _cts = new CancellationTokenSource();
                     ApplyFilters();
                 }
             }
@@ -184,27 +193,26 @@ namespace SomwApp.presentation.viewModels
         {
             Task.Run(() =>
             {
+                    Appointments.Clear();
                 if (CustomerFilter != null)
                 {
-                    Appointments.Clear();
                     foreach (var appointment in _appointmentsDataSource.GetAppointmentsByCustomer(CustomerFilter.ID_Customers) ?? new List<AppointmentsForClasses>())
                         Appointments.Add(new AppointmentsForClassesModel()
                         {
                             ID_AppointmentsForClasses = appointment.ID_AppointmentsForClasses,
-                            Customer = _custsDataSource.GetCustomer(appointment.ID_Customers) ?? new Customer(),
-                            Lesson = _lessonsDataSource.GetLesson(appointment.ID_Lessons) ?? new Lesson(),
+                            Customer = Customers.FirstOrDefault(c => c.ID_Customers == appointment.ID_Customers) ?? new Customer(),
+                            Lesson = Lessons.FirstOrDefault(l => l.ID_Lessons == appointment.ID_Lessons) ?? new Lesson(),
                             Date_recording = appointment.Date_recording,
                             Status_recording = appointment.Status_recording,
                         });
                 }
                 else if (LessonFilter != null)
                 {
-                    Appointments.Clear();
                     foreach (var appointment in _appointmentsDataSource.GetAppointmentsByLessons(LessonFilter.ID_Lessons) ?? new List<AppointmentsForClasses>())
                         Appointments.Add(new AppointmentsForClassesModel()
                         {
                             ID_AppointmentsForClasses = appointment.ID_AppointmentsForClasses,
-                            Customer = _custsDataSource.GetCustomer(appointment.ID_Customers) ?? new Customer(),
+                            Customer = Customers.FirstOrDefault(c => c.ID_Customers == appointment.ID_Customers) ?? new Customer(),
                             Lesson = _lessonsDataSource.GetLesson(appointment.ID_Lessons) ?? new Lesson(),
                             Date_recording = appointment.Date_recording,
                             Status_recording = appointment.Status_recording,
@@ -212,20 +220,29 @@ namespace SomwApp.presentation.viewModels
                 }
                 else if (DateFromFilter.HasValue || DateToFilter.HasValue)
                 {
-                    Appointments.Clear();
                     foreach (var appointment in _appointmentsDataSource.GetAppointmentsInPeriod(
                         DateFromFilter.HasValue ? DateFromFilter.Value : DateOnly.MinValue,
                         DateToFilter.HasValue ? DateToFilter.Value : DateOnly.MaxValue) ?? new List<AppointmentsForClasses>())
                         Appointments.Add(new AppointmentsForClassesModel()
                         {
                             ID_AppointmentsForClasses = appointment.ID_AppointmentsForClasses,
-                            Customer = _custsDataSource.GetCustomer(appointment.ID_Customers) ?? new Customer(),
-                            Lesson = _lessonsDataSource.GetLesson(appointment.ID_Lessons) ?? new Lesson(),
+                            Customer = Customers.FirstOrDefault(c => c.ID_Customers == appointment.ID_Customers) ?? new Customer(),
+                            Lesson = Lessons.FirstOrDefault(l => l.ID_Lessons == appointment.ID_Lessons) ?? new Lesson(),
                             Date_recording = appointment.Date_recording,
                             Status_recording = appointment.Status_recording,
                         });
                 }
-                else UpdateData();
+                else
+                    foreach(var item in from appointment in _appointmentsDataSource.GetAppointments()
+                                       select new AppointmentsForClassesModel()
+                                       {
+                                           ID_AppointmentsForClasses = appointment.ID_AppointmentsForClasses,
+                                           Customer = Customers.FirstOrDefault(c => c.ID_Customers == appointment.ID_Customers) ?? new Customer(),
+                                           Lesson = Lessons.FirstOrDefault(l => l.ID_Lessons == appointment.ID_Lessons) ?? new Lesson(),
+                                           Date_recording = appointment.Date_recording,
+                                           Status_recording = appointment.Status_recording,
+                                       })
+                    Appointments.Add(item);
             }, _cts.Token);
         }
 
@@ -239,21 +256,22 @@ namespace SomwApp.presentation.viewModels
                 Appointments.Clear();
                 Customers.Clear();
                 Lessons.Clear();
+                foreach (var item in _custsDataSource.GetCustomers() ?? new List<Customer>())
+                    Customers.Add(item);
+                foreach (var item in _lessonsDataSource.GetLessons() ?? new List<Lesson>())
+                    Lessons.Add(item);
+
                 foreach (var item in from appointment in _appointmentsDataSource.GetAppointments()
                                      select new AppointmentsForClassesModel()
                                      {
                                          ID_AppointmentsForClasses = appointment.ID_AppointmentsForClasses,
-                                         Customer = _custsDataSource.GetCustomer(appointment.ID_Customers) ?? new Customer(),
-                                         Lesson = _lessonsDataSource.GetLesson(appointment.ID_Lessons) ?? new Lesson(),
+                                         Customer = Customers.FirstOrDefault(c => c.ID_Customers == appointment.ID_Customers) ?? new Customer(),
+                                         Lesson = Lessons.FirstOrDefault(l => l.ID_Lessons == appointment.ID_Lessons) ?? new Lesson(),
                                          Date_recording = appointment.Date_recording,
                                          Status_recording = appointment.Status_recording,
                                      })
                     Appointments.Add(item);
 
-                foreach (var item in _custsDataSource.GetCustomers() ?? new List<Customer>())
-                    Customers.Add(item);
-                foreach (var item in _lessonsDataSource.GetLessons() ?? new List<Lesson>())
-                    Lessons.Add(item);
             }, _cts.Token);
         }
 

@@ -23,7 +23,8 @@ namespace SomwApp.presentation.viewModels
 
         private RelayCommand<CustomerModel>? _customerEditCommand = null;
         public RelayCommand<CustomerModel> CustomerEditCommand => _customerEditCommand ??= new RelayCommand<CustomerModel>(EditCustomer, model => model != null
-        && Customers.Any(c => c.ID_Customer == model.ID_Customer)
+        && Customers.Any()
+        && Customers.Any(c => c != null && c.ID_Customer == model.ID_Customer)
         && !string.IsNullOrEmpty(model.PhoneNumber)
         && !string.IsNullOrEmpty(model.Surname)
         && !string.IsNullOrEmpty(model.Name));
@@ -86,6 +87,8 @@ namespace SomwApp.presentation.viewModels
                 {
                     _statusFilter = value;
                     onPropertyChanged();
+                    _cts.Cancel();
+                    _cts = new CancellationTokenSource();
                     ApplyFilters();
                 }
             }
@@ -98,21 +101,24 @@ namespace SomwApp.presentation.viewModels
                 Customers.Clear();
                 foreach (var customer in _custsDataSource.GetCustomers()??new List<Customer>())
                 {
-                    SubscriptionStatus status = SubscriptionStatus.NotObtain;
-                    if (_paymentsDataSource.GetPaymentsByCustomer(customer.ID_Customers)?.Any()??false)
-                        status = SubscriptionStatus.NotObtain;
-                    else if (_paymentsDataSource.GetPaymentsByCustomer(customer.ID_Customers)?.Any(pay => DateOnly.FromDateTime(DateTime.Now).CompareTo(pay.ValidityEndDate) <= 0)??false)
-                        status = SubscriptionStatus.Active;
-                    else status = SubscriptionStatus.Expired;
-                    Customers.Add(new CustomerModel()
+                    Task.Run(() =>
                     {
-                        ID_Customer = customer.ID_Customers,
-                        Name = customer.Name,
-                        MiddleName = customer.MiddleName,
-                        Surname = customer.Surname,
-                        PhoneNumber = customer.PhoneNumber,
-                        SubscriptionStatus = status
-                    });
+                        SubscriptionStatus status = SubscriptionStatus.NotObtain;
+                        if (_paymentsDataSource.GetPaymentsByCustomer(customer.ID_Customers)?.Any() ?? false)
+                            status = SubscriptionStatus.NotObtain;
+                        else if (_paymentsDataSource.GetPaymentsByCustomer(customer.ID_Customers)?.Any(pay => DateOnly.FromDateTime(DateTime.Now).CompareTo(pay.ValidityEndDate) <= 0) ?? false)
+                            status = SubscriptionStatus.Active;
+                        else status = SubscriptionStatus.Expired;
+                        Customers.Add(new CustomerModel()
+                        {
+                            ID_Customer = customer.ID_Customers,
+                            Name = customer.Name,
+                            MiddleName = customer.MiddleName,
+                            Surname = customer.Surname,
+                            PhoneNumber = customer.PhoneNumber,
+                            SubscriptionStatus = status
+                        });
+                    }, _cts.Token);
                 }
             }, _cts.Token);
         }
@@ -121,15 +127,14 @@ namespace SomwApp.presentation.viewModels
             Task.Run(() =>
             {
 
+                    Customers.Clear();
                 if (StatusFilter != null)
                 {
-                    Customers.Clear();
-
                     switch (StatusFilter)
                     {
                         case SubscriptionStatus.NotObtain:
-                            foreach (var customer in _custsDataSource.GetCustomers()??new List<Customer>())
-                                if (!_paymentsDataSource.GetPaymentsByCustomer(customer.ID_Customers)?.Any()??false)
+                            foreach (var customer in _custsDataSource.GetCustomers() ?? new List<Customer>())
+                                if (!_paymentsDataSource.GetPaymentsByCustomer(customer.ID_Customers)?.Any() ?? false)
                                     Customers.Add(new CustomerModel()
                                     {
                                         ID_Customer = customer.ID_Customers,
@@ -141,7 +146,7 @@ namespace SomwApp.presentation.viewModels
                                     });
                             break;
                         case SubscriptionStatus.Active:
-                            foreach (var customer in _custsDataSource.GetCustomers()??new List<Customer>())
+                            foreach (var customer in _custsDataSource.GetCustomers() ?? new List<Customer>())
                                 if (!_paymentsDataSource.GetPaymentsByCustomer(customer.ID_Customers)?.Any(p => DateOnly.FromDateTime(DateTime.Now).CompareTo(p.ValidityEndDate) >= 0) ?? false)
                                     Customers.Add(new CustomerModel()
                                     {
@@ -168,22 +173,52 @@ namespace SomwApp.presentation.viewModels
                             break;
                     }
                 }
-                else UpdateData();
+                else
+                {
+                    Customers.Clear();
+                    foreach (var customer in _custsDataSource.GetCustomers() ?? new List<Customer>())
+                    {
+                        Task.Run(() =>
+                        {
+                            SubscriptionStatus status = SubscriptionStatus.NotObtain;
+                            if (_paymentsDataSource.GetPaymentsByCustomer(customer.ID_Customers)?.Any() ?? false)
+                                status = SubscriptionStatus.NotObtain;
+                            else if (_paymentsDataSource.GetPaymentsByCustomer(customer.ID_Customers)?.Any(pay => DateOnly.FromDateTime(DateTime.Now).CompareTo(pay.ValidityEndDate) <= 0) ?? false)
+                                status = SubscriptionStatus.Active;
+                            else status = SubscriptionStatus.Expired;
+                            Customers.Add(new CustomerModel()
+                            {
+                                ID_Customer = customer.ID_Customers,
+                                Name = customer.Name,
+                                MiddleName = customer.MiddleName,
+                                Surname = customer.Surname,
+                                PhoneNumber = customer.PhoneNumber,
+                                SubscriptionStatus = status
+                            });
+                        }, _cts.Token);
+                    }
+                }
             },_cts.Token);
         }
         private void DeleteCustomer(CustomerModel model)
         {
             _custsDataSource.DeleteCustomer(model.ID_Customer);
+            _cts.Cancel();
+            _cts = new CancellationTokenSource();
             ApplyFilters();
         }
         private void EditCustomer(CustomerModel model)
         {
             _custsDataSource.EditCustomer((Customer)model);
+            _cts.Cancel();
+            _cts = new CancellationTokenSource();
             ApplyFilters();
         }
         private void AddCustomer(CustomerModel model)
         {
             _custsDataSource.AddCustomer((Customer)model);
+            _cts.Cancel();
+            _cts = new CancellationTokenSource();
             ApplyFilters();
         }
 

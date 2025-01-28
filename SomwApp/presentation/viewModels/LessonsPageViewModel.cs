@@ -81,6 +81,8 @@ namespace SomwApp.presentation.viewModels
                     onClearFilters();
                     _coachFilter = value;
                     onPropertyChanged();
+                    _cts.Cancel();
+                    _cts = new CancellationTokenSource();
                     ApplyFilters();
                 }
             }
@@ -97,6 +99,8 @@ namespace SomwApp.presentation.viewModels
                     onClearFilters();
                     _dateFromFilter = value;
                     onPropertyChanged();
+                    _cts.Cancel();
+                    _cts = new CancellationTokenSource();
                     ApplyFilters();
                 }
             }
@@ -112,6 +116,8 @@ namespace SomwApp.presentation.viewModels
                     onClearFilters();
                     _dateToFilter = value;
                     onPropertyChanged();
+                    _cts.Cancel();
+                    _cts = new CancellationTokenSource();
                     ApplyFilters();
                 }
             }
@@ -128,6 +134,8 @@ namespace SomwApp.presentation.viewModels
                     onClearFilters();
                     _timeFilter = value;
                     onPropertyChanged();
+                    _cts.Cancel();
+                    _cts = new CancellationTokenSource();
                     ApplyFilters();
                 }
             }
@@ -147,6 +155,8 @@ namespace SomwApp.presentation.viewModels
             onPropertyChanged(nameof(TimeFilter));
             _coachFilter = null;
             onPropertyChanged(nameof(CoachFilter));
+            _cts.Cancel();
+            _cts = new CancellationTokenSource();
             ApplyFilters();
         }
 
@@ -220,7 +230,8 @@ namespace SomwApp.presentation.viewModels
                         Lessons.Add(new LessonsModel()
                         {
                             ID_Lessons = lesson.ID_Lessons,
-                            Coach = _coachesDataSource.GetCoach(lesson.ID_Coaches) ?? new Coach(),
+                            Coach = Coaches.FirstOrDefault(c => c.ID_Coaches == lesson.ID_Coaches) ?? new Coach(),
+                            Branch = Branches.FirstOrDefault(b => b.ID_Branches == lesson.ID_Branches) ?? new Branches(),
                             Date = lesson.Date,
                             NumberOfPracticants = lesson.NumberOfPracticants,
                             Time = lesson.Time,
@@ -235,7 +246,8 @@ namespace SomwApp.presentation.viewModels
                         Lessons.Add(new LessonsModel()
                         {
                             ID_Lessons = lesson.ID_Lessons,
-                            Coach = _coachesDataSource.GetCoach(lesson.ID_Coaches) ?? new Coach(),
+                            Coach = Coaches.FirstOrDefault(c => c.ID_Coaches == lesson.ID_Coaches) ?? new Coach(),
+                            Branch = Branches.FirstOrDefault(b => b.ID_Branches == lesson.ID_Branches) ?? new Branches(),
                             Date = lesson.Date,
                             NumberOfPracticants = lesson.NumberOfPracticants,
                             Time = lesson.Time,
@@ -244,18 +256,31 @@ namespace SomwApp.presentation.viewModels
                 }
                 else if (TimeFilter.HasValue)
                 {
-                    foreach (var lesson in _lessonsDataSource.GetLessonsByTime(TimeFilter.Value))
+                    foreach (var lesson in _lessonsDataSource.GetLessonsByTime(TimeFilter.Value) ?? new List<Lesson>())
                         Lessons.Add(new LessonsModel()
                         {
                             ID_Lessons = lesson.ID_Lessons,
-                            Coach = _coachesDataSource.GetCoach(lesson.ID_Coaches),
+                            Coach = Coaches.FirstOrDefault(c => c.ID_Coaches == lesson.ID_Coaches) ?? new Coach(),
+                            Branch = Branches.FirstOrDefault(b => b.ID_Branches == lesson.ID_Branches) ?? new Branches(),
                             Date = lesson.Date,
                             NumberOfPracticants = lesson.NumberOfPracticants,
                             Time = lesson.Time,
                             Title = lesson.Title,
                         });
                 }
-                else UpdateData();
+                else foreach (LessonsModel l in from lesson in _lessonsDataSource.GetLessons()
+                                                select new LessonsModel()
+                                                {
+                                                    ID_Lessons = lesson.ID_Lessons,
+                                                    Coach = Coaches.FirstOrDefault(c => c.ID_Coaches == lesson.ID_Coaches) ?? new Coach(),
+                                                    Branch = Branches.FirstOrDefault(b => b.ID_Branches == lesson.ID_Branches) ?? new Branches(),
+                                                    Date = lesson.Date,
+                                                    NumberOfPracticants = lesson.NumberOfPracticants,
+                                                    Time = lesson.Time,
+                                                    Title = lesson.Title,
+                                                    Hours = lesson.DurationClasses,
+                                                })
+                        Lessons.Add(l);
             }, _cts.Token);
         }
 
@@ -268,25 +293,24 @@ namespace SomwApp.presentation.viewModels
             {
                 Lessons.Clear();
                 Coaches.Clear();
+                foreach (var c in _coachesDataSource.GetCoaches()??new List<Coach>())
+                    Coaches.Add(c);
+                foreach (var b in _branchesDataSource.GetBranches()??new List<Branches>())
+                    Branches.Add(b);
 
                 foreach (LessonsModel l in from lesson in _lessonsDataSource.GetLessons()
                                            select new LessonsModel()
                                            {
                                                ID_Lessons = lesson.ID_Lessons,
-                                               Coach = _coachesDataSource.GetCoach(lesson.ID_Coaches) ?? new Coach(),
+                                               Coach = Coaches.FirstOrDefault(c => c.ID_Coaches == lesson.ID_Coaches) ?? new Coach(),
+                                               Branch = Branches.FirstOrDefault(b => b.ID_Branches == lesson.ID_Branches) ?? new Branches(),
                                                Date = lesson.Date,
                                                NumberOfPracticants = lesson.NumberOfPracticants,
                                                Time = lesson.Time,
                                                Title = lesson.Title,
                                                Hours = lesson.DurationClasses,
-                                               Branch = _branchesDataSource.GetBranch(lesson.ID_Branches) ?? new Branches()
                                            })
                     Lessons.Add(l);
-
-                foreach (var c in _coachesDataSource.GetCoaches()??new List<Coach>())
-                    Coaches.Add(c);
-                foreach (var b in _branchesDataSource.GetBranches()??new List<Branches>())
-                    Branches.Add(b);
             }, _cts.Token);
         }
 
@@ -306,9 +330,9 @@ namespace SomwApp.presentation.viewModels
         /// <returns>True - запись модет быть добавлена, false - не может</returns>
         private bool CanAddLesson(LessonsModel model)
         {
-            if (model == null || model.Coach == null || string.IsNullOrEmpty(model.Title) || model.NumberOfPracticants < 0 || model.Date.ToDateTime(model.Time).CompareTo(DateTime.Now) < 0)
+            if (model == null || model.Coach == null || model.Branch == null || string.IsNullOrEmpty(model.Title) || model.NumberOfPracticants < 0 || model.Date.ToDateTime(model.Time).CompareTo(DateTime.Now) < 0)
                 return false;
-            if (!Branches.Any(b => b.ID_Branches == model.Branch.ID_Branches))
+            if (!Branches.Any(b => b.ID_Branches == model.Branch?.ID_Branches))
                 return false;
             return !Lessons.Any(l => l.Coach == model.Coach && l.Date.ToDateTime(l.Time).CompareTo(model.Date.ToDateTime(model.Time)) == 0);
         }

@@ -60,6 +60,8 @@ namespace SomwApp.presentation.viewModels
                 {
                     _roleFilter = value;
                     onPropertyChanged();
+                    _cts.Cancel();
+                    _cts = new CancellationTokenSource();
                     ApplyFilters();
                 }
             }
@@ -72,19 +74,26 @@ namespace SomwApp.presentation.viewModels
         {
             Task.Run(() =>
             {
+                UserAccounts.Clear();
                 if (RoleFilter != null)
                 {
-                    UserAccounts.Clear();
                     foreach (var account in _accsDataSource.GetAccountsByRole(RoleFilter.ID_Role) ?? new List<UserAccounts>())
                         UserAccounts.Add(new UserAccountModel()
                         {
                             ID_UserAccounts = account.ID_UserAccounts,
                             Login = account.Login,
                             Password = account.Password,
-                            Role = _rolesDataSource.GetRoleByID(account.ID_Roles) ?? new Role()
+                            Role = Roles.FirstOrDefault(r => r.ID_Role == account.ID_Roles) ?? new Role()
                         });
                 }
-                else UpdateData();
+                else foreach (var account in _accsDataSource.GetAccounts() ?? new List<UserAccounts>())
+                        UserAccounts.Add(new UserAccountModel()
+                        {
+                            ID_UserAccounts = account.ID_UserAccounts,
+                            Login = account.Login,
+                            Password = account.Password,
+                            Role = Roles.FirstOrDefault(r => r.ID_Role == account.ID_Roles) ?? new Role()
+                        });
             }, _cts.Token);
         }
 
@@ -107,6 +116,8 @@ namespace SomwApp.presentation.viewModels
             {
                 UserAccounts.Clear();
                 Roles.Clear();
+                foreach (var role in _rolesDataSource.GetRoles() ?? new List<Role>())
+                    Roles.Add(role);
 
                 foreach (var account in _accsDataSource.GetAccounts() ?? new List<UserAccounts>())
                     UserAccounts.Add(new UserAccountModel()
@@ -114,10 +125,8 @@ namespace SomwApp.presentation.viewModels
                         ID_UserAccounts = account.ID_UserAccounts,
                         Login = account.Login,
                         Password = account.Password,
-                        Role = _rolesDataSource.GetRoleByID(account.ID_Roles) ?? new Role()
+                        Role = Roles.FirstOrDefault(r => r.ID_Role == account.ID_Roles) ?? new Role()
                     });
-                foreach (var role in _rolesDataSource.GetRoles() ?? new List<Role>())
-                    Roles.Add(role);
             }, _cts.Token);
         }
 
@@ -159,6 +168,8 @@ namespace SomwApp.presentation.viewModels
         private void EditUserAccount(UserAccountModel model)
         {
             _accsDataSource.EditAccount((UserAccounts)model);
+            _cts.Cancel();
+            _cts = new CancellationTokenSource();
             ApplyFilters();
         }
 
@@ -169,6 +180,8 @@ namespace SomwApp.presentation.viewModels
         private void DeleteUserAccount(UserAccountModel model)
         {
             _accsDataSource.DeleteAccount(model.ID_UserAccounts);
+            _cts.Cancel();
+            _cts = new CancellationTokenSource();
             ApplyFilters();
         }
 
