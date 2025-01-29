@@ -75,7 +75,7 @@ namespace FitnessAPI.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest("Непредвиденная ошибка сервера");
             }
         }
 
@@ -134,7 +134,7 @@ namespace FitnessAPI.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest("Непредвиденная ошибка сервера");
             }
         }
 
@@ -171,7 +171,7 @@ namespace FitnessAPI.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest("Непредвиденная ошибка сервера");
             }
         }
 
@@ -229,7 +229,7 @@ namespace FitnessAPI.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest("Непредвиденная ошибка сервера");
             }
         }
 
@@ -289,7 +289,7 @@ namespace FitnessAPI.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest("Непредвиденная ошибка сервера");
             }
         }
 
@@ -348,7 +348,7 @@ namespace FitnessAPI.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest("Непредвиденная ошибка сервера");
             }
         }
 
@@ -410,7 +410,7 @@ namespace FitnessAPI.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest("Непредвиденная ошибка сервера");
             }
         }
 
@@ -521,7 +521,7 @@ namespace FitnessAPI.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest("Непредвиденная ошибка сервера");
             }
         }
 
@@ -555,6 +555,7 @@ namespace FitnessAPI.Controllers
                     if (coachID.HasValue)
                     {
                         var hasAlready = await _dbContext.Lessons.AnyAsync(l =>
+                        l.IdLessons != lesson.ID_Lessons &&
                         l.IdCoaches == coachID
                         && l.IdBranches == lesson.ID_Branches
                         && l.Time.CompareTo(lesson.Time) == 0
@@ -564,7 +565,8 @@ namespace FitnessAPI.Controllers
 
 
                         var coachBusy = (await _dbContext.Lessons.ToListAsync()).Any(l =>
-                    l != null && l.IdCoaches == coachID
+                    l != null &&
+                    l.IdLessons != lesson.ID_Lessons && l.IdCoaches == coachID
                     && DateTimeCrossChecker.DoDatesCross(
                         l.Date.ToDateTime(l.Time), l.Date.ToDateTime(l.Time.AddHours(Convert.ToDouble(l.DurationClasses))),
                         lesson.Date.ToDateTime(lesson.Time), lesson.Date.ToDateTime(lesson.Time.AddHours(Convert.ToDouble(lesson.DurationClasses)))
@@ -574,6 +576,7 @@ namespace FitnessAPI.Controllers
                             return Conflict("Coach is busy at this time");
 
                         var coachCantGetTo = await _dbContext.Lessons.AnyAsync(l =>
+                        l.IdLessons != lesson.ID_Lessons &&
                         l.IdCoaches == coachID
                         && l.IdBranches != lesson.ID_Branches);
                         if (coachCantGetTo)
@@ -598,6 +601,7 @@ namespace FitnessAPI.Controllers
                         return Conflict("Coach not found");
 
                     var hasAlready = await _dbContext.Lessons.AnyAsync(l =>
+                    l.IdLessons != lesson.ID_Lessons &&
                     l.IdCoaches == lesson.ID_Coaches
                     && l.IdBranches == lesson.ID_Branches
                     && l.Time.CompareTo(lesson.Time) == 0
@@ -606,7 +610,9 @@ namespace FitnessAPI.Controllers
                         return Conflict("Lesson already exists");
 
                     var coachBusy = (await _dbContext.Lessons.ToListAsync()).Any(l =>
-                    l != null && l.IdCoaches == lesson.ID_Coaches
+                    l != null &&
+                    l.IdLessons != lesson.ID_Lessons
+                    && l.IdCoaches == lesson.ID_Coaches
                     && DateTimeCrossChecker.DoDatesCross(
                         l.Date.ToDateTime(l.Time), l.Date.ToDateTime(l.Time.AddHours(Convert.ToDouble(l.DurationClasses))),
                         lesson.Date.ToDateTime(lesson.Time), lesson.Date.ToDateTime(lesson.Time.AddHours(Convert.ToDouble(lesson.DurationClasses)))
@@ -616,6 +622,7 @@ namespace FitnessAPI.Controllers
                         return Conflict("Coach is busy at this time");
 
                     var coachCantGetTo = await _dbContext.Lessons.AnyAsync(l =>
+                    l.IdLessons != lesson.ID_Lessons &&
                     l.IdCoaches == lesson.ID_Coaches
                     && l.IdBranches != lesson.ID_Branches);
                     if (coachCantGetTo)
@@ -638,7 +645,7 @@ namespace FitnessAPI.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest("Непредвиденная ошибка сервера");
             }
         }
 
@@ -683,7 +690,7 @@ namespace FitnessAPI.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest("Непредвиденная ошибка сервера");
             }
         }
     }

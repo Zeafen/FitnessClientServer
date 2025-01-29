@@ -39,18 +39,18 @@ namespace FitnessAPI.Controllers
             {
                 var user = _dbContext.UserAccounts.FirstOrDefault(ac => ac.Login == request.Login);
                 if (user == null)
-                    return Conflict();
+                    return Conflict("Логин не найден");
 
                 var isValidPassw = _hashingService.VerifyHash(
                     value: request.Password,
                     hash: new SaltedHash(user.Password, user.Salt));
 
                 if (!isValidPassw)
-                    return Conflict();
+                    return Conflict("Неправильный пароль");
 
                 var role = _dbContext.Roles.FirstOrDefault(r => r.IdRoles == user.IdRoles);
                 if (role == null)
-                    return Conflict();
+                    return Conflict("Нет данных о роли");
 
                 var token = _tokenService.Generate(
                     _conf, new List<TokenClaim>
@@ -62,7 +62,7 @@ namespace FitnessAPI.Controllers
             }
             catch (Exception ex)
             {
-                return Conflict(ex.Message);
+                return Conflict("Непредвиденная ошибка сервера");
             }
 
         }

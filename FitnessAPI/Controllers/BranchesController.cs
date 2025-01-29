@@ -42,7 +42,7 @@ namespace FitnessAPI.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest("Непредвиденная ошибка сервера");
             }
         }
 
@@ -68,7 +68,7 @@ namespace FitnessAPI.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest("Непредвиденная ошибка сервера");
             }
         }
 
@@ -99,7 +99,7 @@ namespace FitnessAPI.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest("Непредвиденная ошибка сервера");
             }
         }
 
@@ -132,7 +132,7 @@ namespace FitnessAPI.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest("Непредвиденная ошибка сервера");
             }
         }
 
@@ -157,7 +157,7 @@ namespace FitnessAPI.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest("Непредвиденная ошибка сервера");
             }
         } 
     }

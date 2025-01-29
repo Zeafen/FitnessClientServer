@@ -43,7 +43,7 @@ namespace FitnessAPI.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest("Непредвиденная ошибка сервера");
             }
         }
 
@@ -72,7 +72,7 @@ namespace FitnessAPI.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest("Непредвиденная ошибка сервера");
             }
         }
 
@@ -107,7 +107,7 @@ namespace FitnessAPI.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest("Непредвиденная ошибка сервера");
             }
         }
 
@@ -124,10 +124,10 @@ namespace FitnessAPI.Controllers
             {
                 if (customer == null
                     || string.IsNullOrEmpty(customer.Surname) || string.IsNullOrEmpty(customer.Name)
-                    || AgeCheckHelper.CheckAge(customer.BirthDate, DateOnly.FromDateTime(DateTime.Now), 18)
+                    || !AgeCheckHelper.CheckAge(customer.BirthDate, DateOnly.FromDateTime(DateTime.Now), 18)
                     || string.IsNullOrEmpty(customer.PhoneNumber)
                     || !_dbContext.Customers.Any(c => c.IdCustomers == customer.ID_Customers))
-                    return Conflict();
+                    return Conflict("Неверный формат данных. Проверьте корректность введенных данных");
                 var editedCustomer = await _dbContext.Customers.FirstOrDefaultAsync(c => c.IdCustomers == customer.ID_Customers);
 
                 editedCustomer!.BirthDate = customer.BirthDate;
@@ -142,7 +142,7 @@ namespace FitnessAPI.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest("Непредвиденная ошибка сервера");
             }
         }
 
@@ -166,7 +166,7 @@ namespace FitnessAPI.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest("Непредвиденная ошибка сервера");
             }
         }
     }

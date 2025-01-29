@@ -49,7 +49,7 @@ public partial class GymContext : DbContext
             entity.Property(e => e.IdLessons).HasColumnName("ID_Lessons");
             entity.Property(e => e.StatusRecording)
                 .HasMaxLength(50)
-                .IsUnicode(false)
+                .IsUnicode(true)
                 .HasColumnName("Status_recording");
 
             entity.HasOne(d => d.IdCustomersNavigation).WithMany(p => p.AppointmentsForClasses)
@@ -68,10 +68,10 @@ public partial class GymContext : DbContext
             entity.Property(e => e.IdBracnches).HasColumnName("ID_Bracnches");
             entity.Property(e => e.AddressBranches)
                 .HasMaxLength(100)
-                .IsUnicode(false);
+                .IsUnicode(true);
             entity.Property(e => e.NameBranches)
                 .HasMaxLength(100)
-                .IsUnicode(false);
+                .IsUnicode(true);
         });
 
         modelBuilder.Entity<Coach>(entity =>
@@ -85,19 +85,19 @@ public partial class GymContext : DbContext
             entity.Property(e => e.LessonsSchedule).HasColumnType("decimal(10, 2)");
             entity.Property(e => e.MiddleName)
                 .HasMaxLength(255)
-                .IsUnicode(false);
+                .IsUnicode(true);
             entity.Property(e => e.Name)
                 .HasMaxLength(255)
-                .IsUnicode(false);
+                .IsUnicode(true);
             entity.Property(e => e.PhoneNumber)
                 .HasMaxLength(15)
-                .IsUnicode(false);
+                .IsUnicode(true);
             entity.Property(e => e.Specialization)
                 .HasMaxLength(100)
-                .IsUnicode(false);
+                .IsUnicode(true);
             entity.Property(e => e.Surname)
                 .HasMaxLength(255)
-                .IsUnicode(false);
+                .IsUnicode(true);
 
             entity.HasOne(d => d.IdUserAccountsNavigation).WithOne(p => p.Coach)
                 .HasForeignKey<Coach>(d => d.IdUserAccounts)
@@ -111,16 +111,16 @@ public partial class GymContext : DbContext
             entity.Property(e => e.IdCustomers).HasColumnName("ID_Customers");
             entity.Property(e => e.MiddleName)
                 .HasMaxLength(255)
-                .IsUnicode(false);
+                .IsUnicode(true);
             entity.Property(e => e.Name)
                 .HasMaxLength(255)
-                .IsUnicode(false);
+                .IsUnicode(true);
             entity.Property(e => e.PhoneNumber)
                 .HasMaxLength(15)
-                .IsUnicode(false);
+                .IsUnicode(true);
             entity.Property(e => e.Surname)
                 .HasMaxLength(255)
-                .IsUnicode(false);
+                .IsUnicode(true);
         });
 
         modelBuilder.Entity<Lesson>(entity =>
@@ -133,7 +133,7 @@ public partial class GymContext : DbContext
             entity.Property(e => e.IdCoaches).HasColumnName("ID_Coaches");
             entity.Property(e => e.Title)
                 .HasMaxLength(100)
-                .IsUnicode(false);
+                .IsUnicode(true);
 
             entity.HasOne(d => d.IdBranchesNavigation).WithMany(p => p.Lessons)
                 .HasForeignKey(d => d.IdBranches)
@@ -173,7 +173,7 @@ public partial class GymContext : DbContext
             entity.Property(e => e.IdRoles).HasColumnName("ID_Roles");
             entity.Property(e => e.RoleName)
                 .HasMaxLength(30)
-                .IsUnicode(false);
+                .IsUnicode(true);
         });
 
         modelBuilder.Entity<Subscription>(entity =>
@@ -185,11 +185,11 @@ public partial class GymContext : DbContext
             entity.Property(e => e.IdSubscription).HasColumnName("ID_Subscription");
             entity.Property(e => e.Conditions)
                 .HasMaxLength(255)
-                .IsUnicode(false);
+                .IsUnicode(true);
             entity.Property(e => e.Cost).HasColumnType("decimal(10, 2)");
             entity.Property(e => e.TypeofSubscriptuion)
                 .HasMaxLength(50)
-                .IsUnicode(false);
+                .IsUnicode(true);
         });
 
         modelBuilder.Entity<UserAccount>(entity =>
@@ -202,13 +202,13 @@ public partial class GymContext : DbContext
             entity.Property(e => e.IdRoles).HasColumnName("ID_Roles");
             entity.Property(e => e.Login)
                 .HasMaxLength(30)
-                .IsUnicode(false);
+                .IsUnicode(true);
             entity.Property(e => e.Password)
                 .HasMaxLength(500)
-                .IsUnicode(false);
+                .IsUnicode(true);
             entity.Property(e => e.Salt)
                 .HasMaxLength(255)
-                .IsUnicode(false);
+                .IsUnicode(true);
 
             entity.HasOne(d => d.IdRolesNavigation).WithMany(p => p.UserAccounts)
                 .HasForeignKey(d => d.IdRoles)

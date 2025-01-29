@@ -71,7 +71,7 @@ namespace FitnessAPI.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest("Непредвиденная ошибка сервера");
             }
         }
 
@@ -102,7 +102,7 @@ namespace FitnessAPI.Controllers
                         break;
                 }
                 if (string.IsNullOrEmpty(directoryName))
-                    return Conflict("Requested type not found");
+                    return Conflict("Неверный тип отчёта");
                 var files = (from file in new DirectoryInfo(staticFilesPath + @$"\{directoryName}").GetFiles()
                              select new ReviewFile()
                              {
@@ -115,7 +115,7 @@ namespace FitnessAPI.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest("Непредвиденная ошибка сервера");
             }
         }
 
@@ -167,7 +167,7 @@ namespace FitnessAPI.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest("Непредвиденная ошибка сервера");
             }
         }
 
@@ -183,6 +183,7 @@ namespace FitnessAPI.Controllers
             {
                 var directoryInfo = new DirectoryInfo(staticFilesPath + @"\attendance");
                 var files = (from file in directoryInfo.GetFiles()
+                             .Where(f => f.CreationTime.CompareTo(request.DateFrom.ToDateTime(new TimeOnly(0))) >= 0 && f.CreationTime.CompareTo(request.DateTo.ToDateTime(new TimeOnly(23,59))) <= 0)
                              select new ReviewFile()
                              {
                                  ReviewAddress = $@"{Request.Scheme}://{Request.Host.Value}/static/attendance/{file.Name}",
@@ -191,7 +192,7 @@ namespace FitnessAPI.Controllers
                                  ReviewType = ReviewType.Attendance,
                              }).ToList();
                 foreach (var file in new DirectoryInfo(staticFilesPath + @"\branch_efficiency").GetFiles()
-                    .Where(f => f.CreationTime.CompareTo(request.DateFrom) >= 0 && f.CreationTime.CompareTo(request.DateTo) <= 0))
+                    .Where(f => f.CreationTime.CompareTo(request.DateFrom.ToDateTime(new TimeOnly(0))) >= 0 && f.CreationTime.CompareTo(request.DateTo.ToDateTime(new TimeOnly(23,59))) <= 0))
                     files.Add(new ReviewFile()
                     {
                         ReviewAddress = $@"{Request.Scheme}://{Request.Host.Value}/static/branch_efficiency/{file.Name}",
@@ -200,7 +201,7 @@ namespace FitnessAPI.Controllers
                         ReviewType = ReviewType.Branch_Efficiency,
                     });
                 foreach (var file in new DirectoryInfo(staticFilesPath + @"\income").GetFiles()
-                    .Where(f => f.CreationTime.CompareTo(request.DateFrom) >= 0 && f.CreationTime.CompareTo(request.DateTo) <= 0))
+                    .Where(f => f.CreationTime.CompareTo(request.DateFrom.ToDateTime(new TimeOnly(0))) >= 0 && f.CreationTime.CompareTo(request.DateTo.ToDateTime(new TimeOnly(23,59))) <= 0))
                     files.Add(new ReviewFile()
                     {
                         ReviewAddress = $@"{Request.Scheme}://{Request.Host.Value}/static/income/{file.Name}",
@@ -209,7 +210,7 @@ namespace FitnessAPI.Controllers
                         ReviewType = ReviewType.Income,
                     });
                 foreach (var file in new DirectoryInfo(staticFilesPath + @"\trainer_busines").GetFiles()
-                    .Where(f => f.CreationTime.CompareTo(request.DateFrom) >= 0 && f.CreationTime.CompareTo(request.DateTo) <= 0))
+                    .Where(f => f.CreationTime.CompareTo(request.DateFrom.ToDateTime(new TimeOnly(0))) >= 0 && f.CreationTime.CompareTo(request.DateTo.ToDateTime(new TimeOnly(23,59))) <= 0))
                     files.Add(new ReviewFile()
                     {
                         ReviewAddress = $@"{Request.Scheme}://{Request.Host.Value}/static/trainer_busines/{file.Name}",
@@ -221,7 +222,7 @@ namespace FitnessAPI.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest("Непредвиденная ошибка сервера");
             }
         }
 
@@ -253,12 +254,12 @@ namespace FitnessAPI.Controllers
                 }
 
                 if (!fileFormed)
-                    return Conflict("Could not form review");
+                    return Conflict("Не удалось сформировать отчёт");
                 return Ok();
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest("Непредвиденная ошибка сервера");
             }
         }
 
@@ -294,13 +295,12 @@ namespace FitnessAPI.Controllers
                     fileDeleted = true;
                 }
                 if (!fileDeleted)
-                    return NotFound("File review not found");
+                    return NotFound("Отчёт с таким названием не был найден");
                 return Ok();
             }
             catch (Exception ex)
             {
-
-                throw;
+                return BadRequest("Непредвиденная ошибка сервера");
             }
         }
 

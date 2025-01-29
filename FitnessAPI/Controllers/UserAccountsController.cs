@@ -45,7 +45,7 @@ namespace FitnessAPI.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest("Непредвиденная ошибка сервера");
             }
         }
 
@@ -73,7 +73,7 @@ namespace FitnessAPI.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest("Непредвиденная ошибка сервера");
             }
         }
 
@@ -89,7 +89,7 @@ namespace FitnessAPI.Controllers
             {
                 var account = await _dbContext.UserAccounts.FirstOrDefaultAsync(ac => ac.IdUserAccounts == id);
                 if (account == null)
-                    return Conflict("Incorrect id");
+                    return NotFound("Запись с таким id не найдена");
                 var result = new UserAccounts()
                 {
                     ID_Roles = account.IdRoles,
@@ -102,7 +102,7 @@ namespace FitnessAPI.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest("Непредвиденная ошибка сервера");
             }
         }
 
@@ -119,12 +119,12 @@ namespace FitnessAPI.Controllers
             {
                 var accounts = await _dbContext.UserAccounts.ToListAsync();
                 var requestedRole = await _dbContext.Roles.FirstOrDefaultAsync(r => r.IdRoles == account.ID_Roles);
-                if(requestedRole == null
-                    || (requestedRole.RoleName == "Admin" && accounts.Any(ac => ac.IdRoles == requestedRole.IdRoles))
-                    || (requestedRole.RoleName == "Leader" && accounts.Any(ac => ac.IdRoles == requestedRole.IdRoles)))
-                    return Conflict("Cannot add new account with this role");
-                else if(accounts.Count(ac => ac.IdRoles == requestedRole.IdRoles) == 10)
-                    return Conflict("Max amount of trainers");
+                if (requestedRole == null)
+                    return NotFound("Роль не найдена");
+                else if (accounts.Count(ac => ac.IdRoles == requestedRole.IdRoles) == 10)
+                    return Conflict("Макимальное количество тренеров в системе");
+                else if (await _dbContext.UserAccounts.AnyAsync(ac => ac.Login == account.Login))
+                    return Conflict("Пользователь с таким логином уже существует");
                 else
                 {
                     bool areFieldsEmpty = string.IsNullOrEmpty(account.Login) || string.IsNullOrEmpty(account.Password);
@@ -151,7 +151,7 @@ namespace FitnessAPI.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest("Непредвиденная ошибка сервера");
             }
         }
 
@@ -168,14 +168,12 @@ namespace FitnessAPI.Controllers
             {
                 var accountToDelete = await _dbContext.UserAccounts.FirstOrDefaultAsync(ac => ac.IdUserAccounts == id);
                 if (accountToDelete == null)
-                    return Conflict("Incorrect account id");
+                    return NotFound("Запись с таким id не найдена");
                 else
                 {
                     var role = await _dbContext.Roles.FirstOrDefaultAsync(r => r.IdRoles == accountToDelete.IdRoles);
                     if (role == null)
-                        return Conflict("Cannot find role info");
-                    if (role.RoleName == "Admin" || role.RoleName == "Leader")
-                        return Conflict("Cannot remove Accounts of these roles");
+                        return Conflict("Информация о роли не найдена");
 
                     var trainer = await _dbContext.Coaches.FirstOrDefaultAsync(c => c.IdUserAccounts == accountToDelete.IdUserAccounts);
                     if(trainer != null)
@@ -193,7 +191,7 @@ namespace FitnessAPI.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest("Непредвиденная ошибка сервера");
             }
         }
 
@@ -213,17 +211,18 @@ namespace FitnessAPI.Controllers
                 //Check if record exists
                 var recordExists = await _dbContext.UserAccounts.AnyAsync(ac => ac.IdUserAccounts == account.ID_UserAccounts);
                 var loginExists = await _dbContext.UserAccounts.AnyAsync(ac => ac.IdUserAccounts != account.ID_UserAccounts && account.Login == ac.Login);
-                if (!recordExists || loginExists)
-                    return Conflict("Cannot delete this account: check if account exists or has unique login");
+                if (!recordExists)
+                    return NotFound("Запись с таким id не найдена");
+                if (loginExists)
+                    return Conflict("Логин уде существует");
+
 
                 //Check if edited role does not break the rules
                 var requestedRole = await _dbContext.Roles.FirstOrDefaultAsync(r => r.IdRoles == account.ID_Roles);
-                if (requestedRole == null
-                    || (requestedRole.RoleName == "Admin" && accounts.Any(ac => ac.IdRoles == requestedRole.IdRoles))
-                    || (requestedRole.RoleName == "Leader" && accounts.Any(ac => ac.IdRoles == requestedRole.IdRoles)))
-                    return Conflict("Cannot add new account with this role");
+                if (requestedRole == null)
+                    return NotFound("Информация о роли не найдена");
                 else if (accounts.Count(ac => ac.IdRoles == requestedRole.IdRoles) == 10)
-                    return Conflict("Max amount of trainers");
+                    return Conflict("Максимально допустимое количество тренеров в системе");
 
                 //check if edited login and password have correct format
                 bool areFieldsEmpty = string.IsNullOrEmpty(account.Login) || string.IsNullOrEmpty(account.Password);
@@ -250,7 +249,7 @@ namespace FitnessAPI.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest("Непредвиденная ошибка сервера");
             }
         }
     }

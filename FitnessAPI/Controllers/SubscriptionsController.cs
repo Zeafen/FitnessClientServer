@@ -90,13 +90,13 @@ namespace FitnessAPI.Controllers
             {
                 var exists = await _dbContext.Subscriptions.AnyAsync(s => s.TypeofSubscriptuion == subscription.TypeofSubscription);
                 if (exists)
-                    return Conflict("Such subscription already existed");
+                    return Conflict("Подписка с таким названием уже существует");
                 if (string.IsNullOrEmpty(subscription.TypeofSubscription)
                     || string.IsNullOrEmpty(subscription.Conditions)
                     || subscription.NumberofVisits <= 0
                     || subscription.ValidityDaysNumber <= 0
                     || subscription.Cost <= 0)
-                    return Conflict("Incorrect data format");
+                    return Conflict("Некорректный формат данных");
 
                 var newSubscription = new Subscription()
                 {
@@ -130,13 +130,13 @@ namespace FitnessAPI.Controllers
             {
                 var exists = await _dbContext.Subscriptions.AnyAsync(s => s.IdSubscription == subscription.ID_Subscription);
                 if (!exists)
-                    return Conflict("Such subscription does not exist");
+                    return NotFound("Абонемент с таким id не найден");
                 if (string.IsNullOrEmpty(subscription.TypeofSubscription)
                     || string.IsNullOrEmpty(subscription.Conditions)
                     || subscription.NumberofVisits <= 0
                     || subscription.ValidityDaysNumber <= 0
                     || subscription.Cost <= 0)
-                    return Conflict("Incorrect data format");
+                    return Conflict("Некорректный формат данных");
                 var editedSubscription = await _dbContext.Subscriptions.FirstOrDefaultAsync(s => s.IdSubscription == subscription.ID_Subscription);
 
                     editedSubscription!.Conditions = subscription.Conditions;
@@ -168,7 +168,7 @@ namespace FitnessAPI.Controllers
             {
                 var existed = await _dbContext.Subscriptions.FirstOrDefaultAsync(s => s.IdSubscription == id);
                 if (existed == null)
-                    return Conflict("Such subscription does not exist");
+                    return NotFound("Подписка с таким id не найдена");
 
                 _dbContext.Subscriptions.Remove(existed);
                 await _dbContext.SaveChangesAsync();

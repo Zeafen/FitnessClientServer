@@ -94,7 +94,7 @@ namespace FitnessAPI.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest("Непредвиденная ошибка сервера");
             }
         }
 
@@ -108,7 +108,7 @@ namespace FitnessAPI.Controllers
         {
             try
             {
-                if (!(await _dbContext.Customers.AllAsync(c => c.IdCustomers == id)))
+                if (!(await _dbContext.Customers.AnyAsync(c => c.IdCustomers == id)))
                     return NotFound();
                 var token = await HttpContext.GetTokenAsync("access_token");
                 var userRole = new JwtSecurityTokenHandler().ReadJwtToken(token).Claims.FirstOrDefault(c => c.Type == "Role");
@@ -153,7 +153,7 @@ namespace FitnessAPI.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest("Непредвиденная ошибка сервера");
             }
         }
 
@@ -212,7 +212,7 @@ namespace FitnessAPI.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest("Непредвиденная ошибка сервера");
             }
         }
 
@@ -278,7 +278,7 @@ namespace FitnessAPI.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest("Непредвиденная ошибка сервера");
             }
         }
 
@@ -337,7 +337,7 @@ namespace FitnessAPI.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest("Непредвиденная ошибка сервера");
             }
         }
 
@@ -398,7 +398,7 @@ namespace FitnessAPI.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest("Непредвиденная ошибка сервера");
             }
         }
 
@@ -477,7 +477,7 @@ namespace FitnessAPI.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest("Непредвиденная ошибка сервера");
             }
         }
 
@@ -508,11 +508,11 @@ namespace FitnessAPI.Controllers
                 var custAlready = await _dbContext.AppointmentsForClasses.AnyAsync(ap => ap.IdLessons == requestedLesson.IdLessons && ap.IdCustomers == appointment.ID_Customers && ap.IdAppointmentsForClasses != appointment.ID_AppointmentsForClasses);
 
                 //Getting other lessons, that goes on within the requested lesson time
-                var otherLessonsInTime = await _dbContext.Lessons.Where(l => l.IdLessons != requestedLesson.IdLessons
+                var otherLessonsInTime = (await _dbContext.Lessons.ToListAsync()).Where(l => l.IdLessons != requestedLesson.IdLessons
                 && DateTimeCrossChecker.DoDatesCross(
                     l.Date.ToDateTime(l.Time), l.Date.ToDateTime(l.Time.AddHours(decimal.ToDouble(l.DurationClasses))),
                     requestedLesson.Date.ToDateTime(requestedLesson.Time), requestedLesson.Date.ToDateTime(requestedLesson.Time.AddHours(decimal.ToDouble(requestedLesson.DurationClasses))))
-                ).Select(l => l.IdLessons).ToListAsync();
+                ).Select(l => l.IdLessons).ToList();
 
                 //checking if requested customer was signed in those lessons
                 var custBusyInTime = await _dbContext.AppointmentsForClasses.AnyAsync(ap => otherLessonsInTime.Contains(ap.IdLessons) && ap.IdCustomers == appointment.ID_Customers && ap.IdAppointmentsForClasses != appointment.ID_AppointmentsForClasses);
@@ -556,7 +556,7 @@ namespace FitnessAPI.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest("Непредвиденная ошибка сервера");
             }
         }
 
@@ -602,7 +602,7 @@ namespace FitnessAPI.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest("Непредвиденная ошибка сервера");
             }
         }
     }
