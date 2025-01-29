@@ -42,7 +42,7 @@ namespace SomwApp.data.FitnessApiDataSources
                 HttpContent content = new StringContent(JsonConvert.SerializeObject(fileRequest), Encoding.UTF8, "application/json");
                 var result = client.PostAsync(startURL, content).Result;
                 if (!result.IsSuccessStatusCode)
-                    MessageBox.Show($"Не удалось добавить отчёт. \n{result.StatusCode}: {result.Content}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show($"Не удалось добавить отчёт. \n{result.StatusCode}: {result.Content.ReadAsStringAsync().Result}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 else MessageBox.Show($"Отчёт успешно добавлена.", "Error", MessageBoxButton.OK, MessageBoxImage.Information);
 
             }
@@ -73,7 +73,7 @@ namespace SomwApp.data.FitnessApiDataSources
                 query["fileName"] = fileName;
                 var result = client.DeleteAsync(startURL + @$"/{query.ToString()}").Result;
                 if (!result.IsSuccessStatusCode)
-                    MessageBox.Show($"Не удалось удалить запись. \n{result.StatusCode}: {result.Content}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show($"Не удалось удалить запись. \n{result.StatusCode}: {result.Content.ReadAsStringAsync().Result}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 else MessageBox.Show($"Запись успешно удалена", "Error", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)
@@ -102,7 +102,7 @@ namespace SomwApp.data.FitnessApiDataSources
                 var result = client.GetAsync(startURL).Result;
                 if (!result.IsSuccessStatusCode)
                 {
-                    MessageBox.Show($"Не удалось получить отчёты. \n{result.StatusCode}: {result.Content}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show($"Не удалось получить отчёты. \n{result.StatusCode}: {result.Content.ReadAsStringAsync().Result}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     return null;
                 }
                 return JsonConvert.DeserializeObject<List<ReviewFile>>(result.Content.ReadAsStringAsync().Result);
@@ -135,7 +135,7 @@ namespace SomwApp.data.FitnessApiDataSources
                 query["date"] = JsonConvert.SerializeObject(date);
                 var result = client.GetAsync(startURL + @$"/bydate/{query.ToString()}").Result;
                 if (!result.IsSuccessStatusCode){
-                    MessageBox.Show($"Не удалось получить отчёты. \n{result.StatusCode}: {result.Content}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show($"Не удалось получить отчёты. \n{result.StatusCode}: {result.Content.ReadAsStringAsync().Result}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
                 return JsonConvert.DeserializeObject<List<ReviewFile>>(result.Content.ReadAsStringAsync().Result);
 
@@ -169,7 +169,7 @@ namespace SomwApp.data.FitnessApiDataSources
                 var result = client.GetAsync(startURL + @$"/bydate/{query.ToString()}").Result;
                 if (!result.IsSuccessStatusCode)
                 {
-                    MessageBox.Show($"Не удалось получить отчёты. \n{result.StatusCode}: {result.Content}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show($"Не удалось получить отчёты. \n{result.StatusCode}: {result.Content.ReadAsStringAsync().Result}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
                 return JsonConvert.DeserializeObject<List<ReviewFile>>(result.Content.ReadAsStringAsync().Result);
 
@@ -203,7 +203,7 @@ namespace SomwApp.data.FitnessApiDataSources
                 var result = client.PostAsync(startURL + @$"/inperiod", content).Result;
                 if (!result.IsSuccessStatusCode)
                 {
-                    MessageBox.Show($"Не удалось получить отчёты. \n{result.StatusCode}: {result.Content}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show($"Не удалось получить отчёты. \n{result.StatusCode}: {result.Content.ReadAsStringAsync().Result}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
                 return JsonConvert.DeserializeObject<List<ReviewFile>>(result.Content.ReadAsStringAsync().Result);
 

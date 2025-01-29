@@ -43,7 +43,7 @@ namespace SomwApp.data.FitnessApiDataSources
                 HttpContent content = new StringContent(JsonConvert.SerializeObject(account), Encoding.UTF8, "application/json");
                 var result = client.PostAsync(startURL, content).Result;
                 if (!result.IsSuccessStatusCode)
-                    MessageBox.Show($"Не удалось добавить учётную запись. \n{result.StatusCode}: {result.Content}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show($"Не удалось добавить учётную запись. \n{result.StatusCode}: {result.Content.ReadAsStringAsync().Result}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 else MessageBox.Show($"Запись успешно добавлена.", "Error", MessageBoxButton.OK, MessageBoxImage.Information);
 
             }
@@ -73,7 +73,7 @@ namespace SomwApp.data.FitnessApiDataSources
                 client.DefaultRequestHeaders.Add("Authorization", token);
                 var result = client.DeleteAsync(startURL + @$"/{accountID}").Result;
                 if (!result.IsSuccessStatusCode)
-                    MessageBox.Show($"Не удалось удалить учётную запись. \n{result.StatusCode}: {result.Content}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show($"Не удалось удалить учётную запись. \n{result.StatusCode}: {result.Content.ReadAsStringAsync().Result}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 else MessageBox.Show($"Запись успешно удалена", "Error", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)
@@ -104,7 +104,7 @@ namespace SomwApp.data.FitnessApiDataSources
                 HttpContent content = new StringContent(JsonConvert.SerializeObject(account), Encoding.UTF8, "application/json");
                 var result = client.PutAsync(startURL, content).Result;
                 if (!result.IsSuccessStatusCode)
-                    MessageBox.Show($"Не удалось обновить учётную запись. \n{result.StatusCode}: {result.Content}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show($"Не удалось обновить учётную запись. \n{result.StatusCode}: {result.Content.ReadAsStringAsync().Result}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 else MessageBox.Show($"Запись успешно обновлена.", "Error", MessageBoxButton.OK, MessageBoxImage.Information);
 
             }
@@ -133,7 +133,7 @@ namespace SomwApp.data.FitnessApiDataSources
                 client.DefaultRequestHeaders.Add("Authorization", token);
                 var result = client.GetAsync(startURL + @$"/{accountID}").Result;
                 if (!result.IsSuccessStatusCode){
-                    MessageBox.Show($"Не удалось получить учётную запись. \n{result.StatusCode}: {result.Content}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show($"Не удалось получить учётную запись. \n{result.StatusCode}: {result.Content.ReadAsStringAsync().Result}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     return null;
                 }
                 return JsonConvert.DeserializeObject<UserAccounts>(result.Content.ReadAsStringAsync().Result);
@@ -165,7 +165,7 @@ namespace SomwApp.data.FitnessApiDataSources
                 var result = client.GetAsync(startURL).Result;
                 if (!result.IsSuccessStatusCode)
                 {
-                    MessageBox.Show($"Не удалось получить учётные записи. \n{result.StatusCode}: {result.Content}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show($"Не удалось получить учётные записи. \n{result.StatusCode}: {result.Content.ReadAsStringAsync().Result}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     return null;
                 }
                 return JsonConvert.DeserializeObject<List<UserAccounts>>(result.Content.ReadAsStringAsync().Result);
@@ -197,7 +197,7 @@ namespace SomwApp.data.FitnessApiDataSources
                 var result = client.GetAsync(startURL + @$"/byrole/{roleID}").Result;
                 if (!result.IsSuccessStatusCode)
                 {
-                    MessageBox.Show($"Не удалось получить учётную запись. \n{result.StatusCode}: {result.Content}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show($"Не удалось получить учётную запись. \n{result.StatusCode}: {result.Content.ReadAsStringAsync().Result}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     return null;
                 }
                 return JsonConvert.DeserializeObject<List<UserAccounts>>(result.Content.ReadAsStringAsync().Result);

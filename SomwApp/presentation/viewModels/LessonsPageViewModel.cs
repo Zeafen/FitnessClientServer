@@ -321,6 +321,8 @@ namespace SomwApp.presentation.viewModels
         private void EditLesson(LessonsModel model)
         {
             _lessonsDataSource.EditLesson((Lesson)model);
+            _cts.Cancel();
+            _cts = new CancellationTokenSource();
             ApplyFilters();
         }
         /// <summary>
@@ -344,6 +346,8 @@ namespace SomwApp.presentation.viewModels
         private void AddLesson(LessonsModel model)
         {
             _lessonsDataSource.AddLesson((Lesson)model);
+            _cts.Cancel();
+            _cts = new CancellationTokenSource();
             ApplyFilters();
         }
 
@@ -354,6 +358,8 @@ namespace SomwApp.presentation.viewModels
         private void DeleteLesson(LessonsModel model)
         {
             _lessonsDataSource.DeleteLesson(model.ID_Lessons);
+            _cts.Cancel();
+            _cts = new CancellationTokenSource();
             ApplyFilters();
         }
 

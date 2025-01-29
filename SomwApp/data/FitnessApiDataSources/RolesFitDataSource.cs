@@ -41,7 +41,7 @@ namespace SomwApp.data.FitnessApiDataSources
                 var result = client.GetAsync(startURL + @$"/{roleID}").Result;
                 if (!result.IsSuccessStatusCode)
                 {
-                    MessageBox.Show($"Не удалось получить запись. \n{result.StatusCode}: {result.Content}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show($"Не удалось получить запись. \n{result.StatusCode}: {result.Content.ReadAsStringAsync().Result}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     return null;
                 }
                 return JsonConvert.DeserializeObject<Role>(result.Content.ReadAsStringAsync().Result);
@@ -73,7 +73,7 @@ namespace SomwApp.data.FitnessApiDataSources
                 var result = client.GetAsync(startURL).Result;
                 if (!result.IsSuccessStatusCode)
                 {
-                    MessageBox.Show($"Не удалось получить записи. \n{result.StatusCode}: {result.Content}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show($"Не удалось получить записи. \n{result.StatusCode}: {result.Content.ReadAsStringAsync().Result}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     return null;
                 }
                 return JsonConvert.DeserializeObject<List<Role>>(result.Content.ReadAsStringAsync().Result);
