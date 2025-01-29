@@ -69,9 +69,9 @@
                             </TextBox.Text>
                         </TextBox>
                         <StackPanel Grid.Row="5" Grid.ColumnSpan="2">
-                            <Button Content="Изменить данные об оплате" Grid.Row="3" Grid.ColumnSpan="2" VerticalAlignment="Center" Margin="8" Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type Page}}, Path=DataContext.AppointmentEditCommand}" CommandParameter="{Binding ElementName=InfoField, Path=DataContext}"/>
-                            <Button Content="Удалить данные об оплате" Grid.Row="4" Grid.ColumnSpan="2" VerticalAlignment="Center" Margin="8" Click="Button_Click"/>
-                            <Button Content="Добавить данные об оплате" Grid.Row="5" Grid.ColumnSpan="2" VerticalAlignment="Center" Margin="8" Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type Page}}, Path=DataContext.AppointmentAddCommand}" CommandParameter="{Binding ElementName=InfoField, Path=DataContext}"/>
+                            <Button Content="Изменить данные о посещении" Grid.Row="3" Grid.ColumnSpan="2" VerticalAlignment="Center" Margin="8" Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type Page}}, Path=DataContext.AppointmentEditCommand}" CommandParameter="{Binding ElementName=InfoField, Path=DataContext}"/>
+                            <Button Content="Удалить данные о посещении" Grid.Row="4" Grid.ColumnSpan="2" VerticalAlignment="Center" Margin="8" Click="Button_Click"/>
+                            <Button Content="Добавить данные о посещении" Grid.Row="5" Grid.ColumnSpan="2" VerticalAlignment="Center" Margin="8" Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type Page}}, Path=DataContext.AppointmentAddCommand}" CommandParameter="{Binding ElementName=InfoField, Path=DataContext}"/>
                         </StackPanel>
                     </Grid>
                 </ScrollViewer>

@@ -282,9 +282,9 @@ namespace SomwApp.presentation.viewModels
         /// <returns>True - запись может быть добавлена, false - не может</returns>
         private bool CanAddAppointment(AppointmentsForClassesModel model)
         {
-            if (model == null || !Appointments.Any(ap => ap.ID_AppointmentsForClasses == model.ID_AppointmentsForClasses)) return false;
+            if (model == null || model.Customer == null || model.Lesson == null) return false;
             var hasCustAlready = Appointments.Any(ap => ap.Customer.ID_Customers == model.Customer.ID_Customers && ap.Lesson.ID_Lessons == model.Lesson.ID_Lessons);
-            var maxAmountInLesson = Appointments.Where(ap => ap.Lesson.ID_Lessons == model.Lesson.ID_Lessons).ToList().Count == model.Lesson.NumberOfPracticants;
+            var maxAmountInLesson = Appointments.Any() && Appointments.Where(ap => ap.Lesson.ID_Lessons == model.Lesson.ID_Lessons).ToList().Count == model.Lesson.NumberOfPracticants;
             if (hasCustAlready || maxAmountInLesson)
                 return false;
             return true;
@@ -296,7 +296,7 @@ namespace SomwApp.presentation.viewModels
         /// <param name="model">Добавляемое изменена; изменения приемлимы, false - не может; изменения неприемлимы</returns>
         private bool CanEditAppointment(AppointmentsForClassesModel model)
         {
-            if(model == null || !Appointments.Any(ap => ap.ID_AppointmentsForClasses == model.ID_AppointmentsForClasses)) return false;
+            if(model == null || model.Customer == null || model.Lesson == null || !Appointments.Any(ap => ap.ID_AppointmentsForClasses == model.ID_AppointmentsForClasses)) return false;
             var hasCustAlready = Appointments.Any(ap => ap.Customer.ID_Customers == model.Customer.ID_Customers && ap.Lesson.ID_Lessons == model.Lesson.ID_Lessons && ap.ID_AppointmentsForClasses != model.ID_AppointmentsForClasses);
             var maxAmountInLesson = Appointments.Where(ap => ap.Lesson.ID_Lessons == model.Lesson.ID_Lessons && ap.ID_AppointmentsForClasses != model.ID_AppointmentsForClasses).ToList().Count == model.Lesson.NumberOfPracticants;
             if (hasCustAlready || maxAmountInLesson)

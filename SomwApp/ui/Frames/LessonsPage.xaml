@@ -71,7 +71,7 @@
 
 
                         <TextBlock Grid.Row="3" Text="Время:" FontSize="14" FontFamily="Sans" Padding="8" TextAlignment="Center" VerticalAlignment="Center"/>
-                        <materialDesign:TimePicker Grid.Column="1" Grid.Row="3" Margin="8,0" SelectedTime="{Binding Time, Converter={StaticResource DateTimeToTimeConverter}, ConverterCulture=ru}" VerticalAlignment="Center"/>
+                        <materialDesign:TimePicker Grid.Column="1" Grid.Row="3" Margin="8,0" SelectedTime="{Binding Time, ConverterCulture=ru}" VerticalAlignment="Center"/>
 
                         <TextBlock Grid.Row="4" Text="Длительность тренировки (в часах)" TextWrapping="Wrap" FontSize="14" FontFamily="Sans" Padding="8" TextAlignment="Center" VerticalAlignment="Center"/>
                         <TextBox Grid.Row="4" Grid.Column="1" FontSize="10" FontFamily="Sans" Margin="8" VerticalAlignment="Center" TextWrapping="NoWrap" TextAlignment="Center">
@@ -104,9 +104,9 @@
                         <ComboBox Grid.Column="1" Grid.Row="7" Margin="12" FontSize="10" FontFamily="Sans" ItemsSource="{Binding RelativeSource={RelativeSource AncestorType={x:Type Page}}, Path=DataContext.Branches}" SelectedItem="{Binding Branch}" DisplayMemberPath="Name_Branches"/>
 
                         <StackPanel Grid.Row="8" Grid.ColumnSpan="2">
-                            <Button Content="Изменить данные об оплате" Grid.Row="3" Grid.ColumnSpan="2" VerticalAlignment="Center" Margin="8" Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type Page}}, Path=DataContext.LessonEditCommand}" CommandParameter="{Binding ElementName=InfoField, Path=DataContext}"/>
-                            <Button Content="Удалить данные об оплате" Grid.Row="4" Grid.ColumnSpan="2" VerticalAlignment="Center" Margin="8" Click="Button_Click"/>
-                            <Button Content="Добавить данные об оплате" Grid.Row="5" Grid.ColumnSpan="2" VerticalAlignment="Center" Margin="8" Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type Page}}, Path=DataContext.LessonAddCommand}" CommandParameter="{Binding ElementName=InfoField, Path=DataContext}"/>
+                            <Button Content="Изменить данные о занятии" Grid.Row="3" Grid.ColumnSpan="2" VerticalAlignment="Center" Margin="8" Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type Page}}, Path=DataContext.LessonEditCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType={x:Type Page}}, Path=DataContext.SelectedLesson}"/>
+                            <Button Content="Удалить данные о занятии" Grid.Row="4" Grid.ColumnSpan="2" VerticalAlignment="Center" Margin="8" Click="Button_Click"/>
+                            <Button Content="Добавить данные о занятии" Grid.Row="5" Grid.ColumnSpan="2" VerticalAlignment="Center" Margin="8" Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type Page}}, Path=DataContext.LessonAddCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType={x:Type Page}}, Path=DataContext.SelectedLesson}"/>
                         </StackPanel>
                     </Grid>
                 </ScrollViewer>

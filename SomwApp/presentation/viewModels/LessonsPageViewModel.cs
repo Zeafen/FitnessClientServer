@@ -39,7 +39,7 @@ namespace SomwApp.presentation.viewModels
         private ICoachesDataSource _coachesDataSource = CoachesFitDataSource.GetInstance();
         private ILessonsDataSource _lessonsDataSource = LessonsFitDataSource.GetInstance();
         private IBranchesDataSource _branchesDataSource = BranchesFitDataSource.GetInstance();
-        private CancellationTokenSource _cts = new CancellationTokenSource();
+        private CancellationTokenSource _cts { get; set; } = new CancellationTokenSource();
 
 
         public LessonsPageViewModel()
@@ -53,7 +53,14 @@ namespace SomwApp.presentation.viewModels
         }
         ~LessonsPageViewModel()
         {
-            _cts.Cancel();
+            try
+            {
+                _cts.Cancel();
+            }
+            catch (ObjectDisposedException ex)
+            {
+
+            }
         }
 
         private LessonsModel _selectedLesson { get; set; } = new LessonsModel();
@@ -81,8 +88,18 @@ namespace SomwApp.presentation.viewModels
                     onClearFilters();
                     _coachFilter = value;
                     onPropertyChanged();
-                    _cts.Cancel();
-                    _cts = new CancellationTokenSource();
+                    try
+                    {
+                        _cts.Cancel();
+                    }
+                    catch (ObjectDisposedException ex)
+                    {
+
+                    }
+                    finally
+                    {
+                        ApplyFilters();
+                    }
                     ApplyFilters();
                 }
             }
@@ -99,8 +116,19 @@ namespace SomwApp.presentation.viewModels
                     onClearFilters();
                     _dateFromFilter = value;
                     onPropertyChanged();
-                    _cts.Cancel();
-                    _cts = new CancellationTokenSource();
+                    try
+                    {
+                        _cts.Cancel();
+                    }
+                    catch (ObjectDisposedException ex)
+                    {
+
+                    }
+                    finally
+                    {
+                        ApplyFilters();
+                    }
+
                     ApplyFilters();
                 }
             }
@@ -116,8 +144,19 @@ namespace SomwApp.presentation.viewModels
                     onClearFilters();
                     _dateToFilter = value;
                     onPropertyChanged();
-                    _cts.Cancel();
-                    _cts = new CancellationTokenSource();
+                    try
+                    {
+                        _cts.Cancel();
+                    }
+                    catch (ObjectDisposedException ex)
+                    {
+
+                    }
+                    finally
+                    {
+                        ApplyFilters();
+                    }
+
                     ApplyFilters();
                 }
             }
@@ -134,8 +173,19 @@ namespace SomwApp.presentation.viewModels
                     onClearFilters();
                     _timeFilter = value;
                     onPropertyChanged();
-                    _cts.Cancel();
-                    _cts = new CancellationTokenSource();
+                    try
+                    {
+                        _cts.Cancel();
+                    }
+                    catch (ObjectDisposedException ex)
+                    {
+
+                    }
+                    finally
+                    {
+                        ApplyFilters();
+                    }
+
                     ApplyFilters();
                 }
             }
@@ -155,8 +205,19 @@ namespace SomwApp.presentation.viewModels
             onPropertyChanged(nameof(TimeFilter));
             _coachFilter = null;
             onPropertyChanged(nameof(CoachFilter));
-            _cts.Cancel();
-            _cts = new CancellationTokenSource();
+            try
+            {
+                _cts.Cancel();
+            }
+            catch (ObjectDisposedException ex)
+            {
+
+            }
+            finally
+            {
+                ApplyFilters();
+            }
+
             ApplyFilters();
         }
 
@@ -220,6 +281,7 @@ namespace SomwApp.presentation.viewModels
         /// </summary>
         private void ApplyFilters()
         {
+            _cts = new CancellationTokenSource();
             Task.Run(() =>
             {
                 Lessons.Clear();
@@ -281,6 +343,7 @@ namespace SomwApp.presentation.viewModels
                                                     Hours = lesson.DurationClasses,
                                                 })
                         Lessons.Add(l);
+                _cts.Dispose();
             }, _cts.Token);
         }
 
@@ -289,6 +352,7 @@ namespace SomwApp.presentation.viewModels
         /// </summary>
         private void UpdateData()
         {
+            _cts = new CancellationTokenSource();
             Task.Run(() =>
             {
                 Lessons.Clear();
@@ -311,6 +375,7 @@ namespace SomwApp.presentation.viewModels
                                                Hours = lesson.DurationClasses,
                                            })
                     Lessons.Add(l);
+                _cts.Dispose();
             }, _cts.Token);
         }
 
@@ -321,9 +386,18 @@ namespace SomwApp.presentation.viewModels
         private void EditLesson(LessonsModel model)
         {
             _lessonsDataSource.EditLesson((Lesson)model);
-            _cts.Cancel();
-            _cts = new CancellationTokenSource();
-            ApplyFilters();
+            try
+            {
+                _cts.Cancel();
+            }
+            catch (ObjectDisposedException ex)
+            {
+
+            }
+            finally
+            {
+                ApplyFilters();
+            }
         }
         /// <summary>
         /// Проверка, может ли занятие быть добавлено
@@ -332,7 +406,7 @@ namespace SomwApp.presentation.viewModels
         /// <returns>True - запись модет быть добавлена, false - не может</returns>
         private bool CanAddLesson(LessonsModel model)
         {
-            if (model == null || model.Coach == null || model.Branch == null || string.IsNullOrEmpty(model.Title) || model.NumberOfPracticants < 0 || model.Date.ToDateTime(model.Time).CompareTo(DateTime.Now) < 0)
+            if (model == null || model.Coach == null || model.Branch == null || string.IsNullOrEmpty(model.Title) || model.NumberOfPracticants < 0)
                 return false;
             if (!Branches.Any(b => b.ID_Branches == model.Branch?.ID_Branches))
                 return false;
@@ -346,9 +420,18 @@ namespace SomwApp.presentation.viewModels
         private void AddLesson(LessonsModel model)
         {
             _lessonsDataSource.AddLesson((Lesson)model);
-            _cts.Cancel();
-            _cts = new CancellationTokenSource();
-            ApplyFilters();
+            try
+            {
+                _cts.Cancel();
+            }
+            catch (ObjectDisposedException ex)
+            {
+
+            }
+            finally
+            {
+                ApplyFilters();
+            }
         }
 
         /// <summary>
@@ -358,9 +441,18 @@ namespace SomwApp.presentation.viewModels
         private void DeleteLesson(LessonsModel model)
         {
             _lessonsDataSource.DeleteLesson(model.ID_Lessons);
-            _cts.Cancel();
-            _cts = new CancellationTokenSource();
-            ApplyFilters();
+            try
+            {
+                _cts.Cancel();
+            }
+            catch (ObjectDisposedException ex)
+            {
+
+            }
+            finally
+            {
+                ApplyFilters();
+            }
         }
 
 

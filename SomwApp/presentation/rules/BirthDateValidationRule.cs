@@ -19,14 +19,17 @@ namespace SomwApp.presentation.rules
             DateOnly? date = null;
             try
             {
-                date = DateOnly.Parse((string)value);
+                if (value is DateTime dt)
+                    date = DateOnly.FromDateTime(dt);
+                else if (value is DateOnly dateOnly)
+                    date = dateOnly;
             }
             catch (Exception ex)
             {
                 return new ValidationResult(false, $"Invalid characters or {ex.Message}");
                 throw;
             }
-            if (date.HasValue && CheckAge(date.Value, DateOnly.FromDateTime(DateTime.Now)))  return new ValidationResult(false, "Age must have value between 18 and 100");
+            if (date.HasValue && !CheckAge(date.Value, DateOnly.FromDateTime(DateTime.Now)))  return new ValidationResult(false, "Age must have value between 18 and 100");
             return new ValidationResult(true, null);
         }
 

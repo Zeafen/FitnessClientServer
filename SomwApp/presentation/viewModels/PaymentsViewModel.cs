@@ -168,7 +168,7 @@ namespace SomwApp.presentation.viewModels
             {
                 if(model == null || model.Subscription == null || model.Customer == null)
                     return false;
-                if (Payments.Any(p => p.ValidityEndDate.CompareTo(DateOnly.FromDateTime(DateTime.Now)) >= 0))
+                if (Payments.Any(p => p.Customer?.ID_Customers != null && p.Customer.ID_Customers == model.Customer.ID_Customers && p.ValidityEndDate.CompareTo(model.PaymentDate) >= 0))
                     return false;
                 return true;
             }
@@ -188,7 +188,7 @@ namespace SomwApp.presentation.viewModels
             {
                 if (model == null || model.Subscription == null || model.Customer == null)
                     return false;
-                if (Payments.Any(p => p.ID_Payment != model.ID_Payment && p.ValidityEndDate.CompareTo(DateOnly.FromDateTime(DateTime.Now)) >= 0))
+                if (!Payments.Any(p => p.ID_Payment == model.ID_Payment) || Payments.Any(p => p.ID_Payment != model.ID_Payment && p.Customer?.ID_Customers != null && model.Customer.ID_Customers == model.Customer.ID_Customers && p.ValidityEndDate.CompareTo(model.PaymentDate) >= 0))
                     return false;
                 return true;
             }
